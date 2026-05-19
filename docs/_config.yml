@@ -1,0 +1,20 @@
+title: StorySpec
+description: Write the story once. Run it as a test.
+url: ""
+theme: minima
+
+plugins:
+  - jekyll-relative-links
+
+relative_links:
+  enabled: true
+  collections: true
+
+markdown: kramdown
+kramdown:
+  input: GFM
+
+header_pages:
+  - getting-started.md
+  - format.md
+  - status.md

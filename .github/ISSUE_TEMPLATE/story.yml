@@ -1,0 +1,47 @@
+name: New story
+description: Propose a new StorySpec story
+title: "[S???] "
+labels: ["story"]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: Story ID
+      placeholder: S042
+    validations:
+      required: true
+
+  - type: input
+    id: epic
+    attributes:
+      label: Epic
+      placeholder: auth
+
+  - type: dropdown
+    id: estimate
+    attributes:
+      label: Estimate
+      options: [XS, S, M, L, XL]
+    validations:
+      required: true
+
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      placeholder: "As a <role>, I want <need>, so that <value>."
+    validations:
+      required: true
+
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance Criteria (Gherkin)
+      placeholder: |
+        ### Scenario: Happy path
+
+        * **Given** ...
+        * **When** ...
+        * **Then** ...
+    validations:
+      required: true

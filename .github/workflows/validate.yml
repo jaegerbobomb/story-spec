@@ -1,0 +1,29 @@
+name: Validate examples
+
+on:
+  pull_request:
+    paths:
+      - 'examples/stories/**'
+      - 'scripts/extract_features.py'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dry-run extraction
+        run: |
+          python3 scripts/extract_features.py \
+            --stories-dir=examples/stories \
+            --output-dir=/tmp/features \
+            --dry-run --verbose
+
+      - name: Verify at least one .feature was generated
+        run: |
+          python3 scripts/extract_features.py \
+            --stories-dir=examples/stories \
+            --output-dir=/tmp/features
+          count=$(ls /tmp/features/*.feature 2>/dev/null | wc -l)
+          echo "Generated $count .feature file(s)"
+          [ "$count" -gt 0 ] || { echo "No .feature files generated"; exit 1; }
