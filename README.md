@@ -1,13 +1,17 @@
 # StorySpec
 
-**Write the story once. Run it as a test.**
+**Write the story once. Run it as a test. Compose the rest as modules.**
 
 User stories as living specifications - one markdown file, three audiences:
-product owner, developer, CI pipeline.
+product owner, developer, CI pipeline. StorySpec is now a **modular kit**: a
+small mandatory core plus opt-in modules you compose per project.
 
 → [Full specification](SPEC.md)
-→ [Getting started](docs/getting-started.md)
+→ [Getting started](docs/tutorials/getting-started.md)
+→ [Migrating to the modular kit](docs/how-to/migrating-to-modular.md)
 → [Examples](examples/)
+→ [Architecture decisions](docs/adr/)
+→ [Changelog](CHANGELOG.md)
 
 ---
 
@@ -33,6 +37,7 @@ epic: auth
 status: done
 estimate: S
 bdd: true
+updated: "2026-06-21"
 ---
 
 ## User story
@@ -61,28 +66,102 @@ Generated `.feature` files are build artifacts - gitignored.
 3. **YAML frontmatter carries metadata.** Status, estimate, dependencies - all machine-readable.
 4. **Diagrams live with the story.** Mermaid renders natively in GitHub and most IDEs - no external tools.
 5. **Framework-agnostic format.** The extraction script is the only implementation detail; the format works with any BDD runner.
+6. **Core + opt-in modules.** The lifecycle is mandatory; everything else (ADR, release, GitHub piloting…) is a module you turn on per project. See [ADR-0001](docs/adr/0001-modular-story-spec.md).
+
+## The modular kit
+
+StorySpec moved from *"templates to copy"* to a *"kit to compose"*. A project
+declares the modules it wants in a manifest, and `story-spec init` composes the
+`CLAUDE.md`, the SPEC and the scaffolding from the core plus those modules.
+
+```
+story-spec/
+├── CLAUDE.dist.md          # composition template (@import of core + enabled modules)
+├── SPEC.md                 # format spec (lifecycle: 6 statuses, `updated` field)
+├── core/                   # mandatory: core CLAUDE fragment (lifecycle lives in SPEC.md)
+│   └── CLAUDE.core.md
+├── modules/<name>/         # opt-in: CLAUDE.md, SPEC.section.md, templates/, skills/
+├── agents/                 # story-author, story-implementer, spec-guardian
+├── skills/                 # release-bump (+ adr-new shipped by the adr module)
+├── scripts/init.sh         # composer / scaffolder / autonomy linter
+└── .story-spec/
+    └── manifest.example.yaml   # declares enabled modules for a project
+```
+
+### Available modules
+
+| Module | Purpose |
+|---|---|
+| `adr` | Architecture Decision Records (+ `adr-new` skill) |
+| `github-piloting` | epics + sub-issues + session log |
+| `release-versioning` | CHANGELOG + version + README kept in sync |
+| `story-lint` | CI gate: `lint_stories.py` validates every story file |
+| `claude-code` | `session-start` hook, `settings.json`, agents & skills |
+| `docs-diataxis` | organize the app's product docs along the four Diátaxis modes |
+| `visual-review` | screenshots synced to delivered UI stories (tool-agnostic) |
+
+**Module autonomy (ADR-0002):** each `modules/<name>/CLAUDE.md` fragment is
+self-contained — no cross-module `@import`. Only `CLAUDE.dist.md` aggregates.
+That is what keeps a module copy-pasteable into a plain `AGENTS.md`.
+`scripts/init.sh --check` enforces this invariant (lint only, non-zero exit on
+violation) and runs in CI.
+
+## Install into your repo
+
+From the root of your project, one line vendors the kit and bootstraps it:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jaegerbobomb/story-spec/main/scripts/install.sh | bash
+```
+
+It downloads the kit, vendors the full catalog under `.story-spec/dist/`, copies the
+runtime scripts into `scripts/`, creates `.story-spec/manifest.yaml`, and composes
+`CLAUDE.md`. The project is then self-contained — `init.sh` auto-detects the vendored
+kit, so you never need the source checkout again.
+
+```bash
+# pin a version, or vendor without the initial compose
+curl -fsSL .../install.sh | STORY_SPEC_REF=v0.1.0 bash
+curl -fsSL .../install.sh | STORY_SPEC_NO_INIT=1 bash
+```
+
+Prefer not to pipe to a shell? Alternatives:
+
+- **git subtree** — `git subtree add --prefix .story-spec/dist https://github.com/jaegerbobomb/story-spec main --squash`, then copy the scripts you need and run `bash .story-spec/dist/scripts/init.sh`.
+- **Manual** — download/clone the repo and run `STORY_SPEC_DIST=path/to/story-spec bash path/to/story-spec/scripts/init.sh` from your project root.
 
 ## Quick start
 
+After installing (or from a clone of this repo):
+
 ```bash
-# 1. Copy the templates into your project
-cp templates/stories-README.md yourproject/stories/README.md
-cp templates/story.md yourproject/stories/S001-your-first-story.md
-cp scripts/extract_features.py yourproject/scripts/
+# 1. Declare the modules you want for your project
+$EDITOR .story-spec/manifest.yaml      # pick modules, agents, skills, test adapter
 
-# 2. Write the story, fill in the Acceptance Criteria
+# 2. Preview what would be scaffolded, then compose
+bash scripts/init.sh --dry-run
+bash scripts/init.sh
 
-# 3. Generate .feature files before running your BDD suite
+# 3. Write the story, fill in the Acceptance Criteria, then lint it
+python3 scripts/lint_stories.py --stories-dir=stories
+
+# 4. Generate .feature files before running your BDD suite
 python3 scripts/extract_features.py
 
-# 4. Run Behat / Cucumber as usual
+# 5. Run Behat / Cucumber as usual
 ```
+
+Re-run `bash scripts/init.sh --sync` after editing the manifest to recompose
+`CLAUDE.md`.
 
 ## Scripts
 
 | Script | Language | Purpose |
 |---|---|---|
+| `scripts/install.sh` | Bash | Vendor the kit into another repo and bootstrap it |
+| `scripts/init.sh` | Bash | Compose `CLAUDE.md` + scaffold core/modules from the manifest (`--dry-run`, `--sync`, `--check`) |
 | `scripts/extract_features.py` | Python 3 (stdlib) | Story → `.feature` generator |
+| `scripts/lint_stories.py` | Python 3 (stdlib) | Validate story files (`story-lint`; `--strict`) |
 | `scripts/generate_report.py` | Python 3 (stdlib) | Markdown status report for GitHub Pages |
 | `scripts/stories_status.sh` | Bash | Colour-coded terminal dashboard |
 | `scripts/ports/php/extract_features.php` | PHP 8+ | PHP port for projects that already have PHP |

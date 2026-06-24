@@ -1,0 +1,34 @@
+# .story-spec/manifest.yaml — declares the modules enabled for THIS project.
+# The core is always present; modules are opt-in.
+# `story-spec init` reads this file to compose CLAUDE.dist.md, the SPEC, and scaffold the dirs.
+
+version: 1
+
+# Test adapter (exactly one): selects the extraction generator used.
+# Values: bdd-behat (PHP) | bdd-pytest (Python) | bdd-vitest (JS/TS) | none
+test_adapter: bdd-behat
+
+# Enabled modules (order = import order in CLAUDE.dist.md).
+modules:
+  - adr                 # Architecture Decision Records (+ adr-new skill)
+  - github-piloting     # epics + sub-issues + session log
+  - release-versioning  # CHANGELOG + version + README kept in sync
+  - claude-code         # session-start hook, settings.json, agents/skills
+  # - story-lint        # CI gate: lint_stories.py validates every story file
+  # - docs-diataxis     # organize product docs along the four Diátaxis modes
+  # - visual-review     # screenshots synced to stories
+
+# Agents & skills installed (they live under .claude/). `init` copies only those listed.
+agents:
+  - story-author
+  - story-implementer
+  - spec-guardian
+skills:
+  - release-bump
+  # adr-new is shipped by the `adr` module and installed automatically with it.
+
+# Project metadata (substituted into templates during `init`).
+project:
+  name: "my-app"
+  language: php          # php | python | node
+  quality_check: "make cs-fix && make phpstan"

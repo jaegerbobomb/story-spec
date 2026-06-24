@@ -6,6 +6,13 @@ permalink: /getting-started/
 
 # Getting started
 
+> **Using the modular kit?** The fastest path is `scripts/init.sh`: declare your
+> modules in `.story-spec/manifest.yaml`, run `bash scripts/init.sh`, and it composes
+> `CLAUDE.md` and scaffolds the core + modules for you — see the
+> [README quick start](https://github.com/jaegerbobomb/story-spec#quick-start) and the
+> [migration guide](../how-to/migrating-to-modular.md). The manual steps below still
+> work for a minimal, script-only setup.
+
 ## Prerequisites
 
 - Python 3.8+ (no pip dependencies - stdlib only)
