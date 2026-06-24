@@ -31,7 +31,8 @@ git switch -c chore/migrate-storyspec-modular
 ## Step 1 — Declare the manifest
 
 ```bash
-cp .story-spec/manifest.example.yaml .story-spec/manifest.yaml
+mkdir -p .story-spec
+cp kit/manifest.example.yaml .story-spec/manifest.yaml
 $EDITOR .story-spec/manifest.yaml
 ```
 

@@ -7,9 +7,7 @@ on:
       - 'scripts/extract_features.py'
       - 'scripts/lint_stories.py'
       - 'scripts/init.sh'
-      - 'core/**'
-      - 'modules/**'
-      - 'CLAUDE.dist.md'
+      - 'kit/**'
 
 jobs:
   validate:

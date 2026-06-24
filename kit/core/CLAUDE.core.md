@@ -1,6 +1,7 @@
 # Core — CLAUDE fragment (always imported)
 
-> Imported at the top of `CLAUDE.dist.md`. Holds the invariant: propose the story,
+> Imported at the top of `CLAUDE.dist.md`. This is your **operating contract**, not
+> reference docs: follow it on every turn. It holds the invariant — propose the story,
 > red→green loop, bug doctrine. Project/language specifics come from the modules.
 
 ## Absolute rule — propose the story first

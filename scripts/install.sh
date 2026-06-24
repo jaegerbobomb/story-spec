@@ -34,13 +34,13 @@ say "downloading $REPO@$REF"
 curl -fsSL "https://codeload.github.com/$REPO/tar.gz/$REF" | tar -xz -C "$tmp" \
   || fail "download failed (check the repo/ref or your network)"
 src="$(find "$tmp" -mindepth 1 -maxdepth 1 -type d | head -n1)"
-[ -d "$src/core" ] || fail "unexpected archive layout"
+[ -d "$src/kit/core" ] || fail "unexpected archive layout"
 
-# 1) Vendor the full catalog (source of truth for init's DIST auto-detection).
+# 1) Vendor the full catalog (kit/) — source of truth for init's DIST auto-detection.
 say "vendoring kit into .story-spec/dist"
 rm -rf "$DIST"; mkdir -p "$DIST"
-cp -R "$src/core" "$src/modules" "$src/agents" "$src/skills" "$src/CLAUDE.dist.md" "$DIST/"
-[ -d "$src/templates" ] && cp -R "$src/templates" "$DIST/"
+cp -R "$src/kit/core" "$src/kit/modules" "$src/kit/agents" "$src/kit/skills" "$src/kit/CLAUDE.dist.md" "$DIST/"
+[ -d "$src/kit/templates" ] && cp -R "$src/kit/templates" "$DIST/"
 
 # 2) Copy the scripts the project calls directly.
 mkdir -p "$ROOT/scripts"
@@ -53,7 +53,7 @@ chmod +x "$ROOT/scripts/init.sh" 2>/dev/null || true
 mkdir -p "$ROOT/.story-spec"
 fresh=0
 if [ ! -f "$ROOT/.story-spec/manifest.yaml" ]; then
-  cp "$src/.story-spec/manifest.example.yaml" "$ROOT/.story-spec/manifest.yaml"
+  cp "$src/kit/manifest.example.yaml" "$ROOT/.story-spec/manifest.yaml"
   fresh=1
   say "created .story-spec/manifest.yaml (default selection)"
 fi
