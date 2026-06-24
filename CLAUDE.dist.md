@@ -1,74 +1,27 @@
-# StorySpec — CLAUDE.md snippet
+# CLAUDE.md — operational conventions (composed by story-spec)
 
-This file is a distributable template for projects using StorySpec.
-Copy the relevant sections into your project's `CLAUDE.md`.
+> ⚙️ **File composed** by `story-spec init` from the core + the modules declared in
+> `.story-spec/manifest.yaml`. Do not edit the `@import` blocks by hand: re-run
+> `story-spec init --sync` after changing the manifest. **Project-specific** content
+> (stack, commands, house rules) goes under "Project-specific".
 
----
+## Core
 
-## User stories
+@.story-spec/core/CLAUDE.core.md
 
-See `stories/README.md` for the full story format and workflow.
+## Enabled modules
 
-**Absolute rule**: always propose a story file (`stories/S<NNN>-<slug>.md`)
-and wait for human validation before starting any feature development.
-The only exceptions are urgent bug fixes and minor refactors with no
-functional impact.
+<!-- BEGIN story-spec:modules (generated) -->
+@.story-spec/modules/adr/CLAUDE.md
+@.story-spec/modules/github-piloting/CLAUDE.md
+@.story-spec/modules/release-versioning/CLAUDE.md
+@.story-spec/modules/claude-code/CLAUDE.md
+<!-- END story-spec:modules -->
 
-### Story workflow (per story)
+## Project-specific
 
-1. Read the full story file: `stories/S<NNN>-*.md`.
-2. Check `depends_on` — if any listed story is not `done`, flag it before starting.
-3. Propose a short plan (5–10 lines: classes to create/modify, layers affected).
-4. **Tests first:**
-   - If `bdd: true`: run `<extract-features-command>` to generate the `.feature` file,
-     write step definitions → red.
-   - If `bdd: false`: write unit/integration tests directly → red.
-5. Implement (green). Refactor if needed (still green).
-6. Run quality checks (linter, static analysis).
-7. Single commit: `feat(S<NNN>): <short slug>`.
-8. Set the story `status` to `done`.
+<!-- Everything that does not come from story-spec: stack, versions, make commands, house rules. -->
 
-**Stop and split** if the story exceeds one effective day or 300 lines of
-production code. Propose sub-stories (e.g. `S006a`, `S006b`) and wait
-for validation before continuing.
-
-**When a story is ambiguous**: ask before coding. Never guess silently.
-Add the answer to the story's `## Notes` section.
-
-### Commands
-
-Adapt these to your project's toolchain:
-
-```bash
-# Generate .feature files from stories with `bdd: true`
-<extract-features-command>
-# e.g. python3 scripts/extract_features.py
-# e.g. make extract-features
-
-# Run BDD acceptance tests (includes feature generation)
-<bdd-test-command>
-# e.g. make behat
-# e.g. npx cucumber-js
-
-# Print the story status dashboard
-<stories-status-command>
-# e.g. bash scripts/stories_status.sh
-# e.g. make stories-status
-```
-
-### Commit scope
-
-Use the story ID as the commit scope:
-
-```
-feat(S007): add program cycle prescription
-fix(S012): handle missing patient in enrollment flow
-test(S003): cover edge case in registration validator
-```
-
-For non-story commits, use the component name as scope:
-
-```
-fix(ci): pin Node.js version to 22
-chore(deps): update prettier to 3.x
-```
+- **Stack**: <to fill in>
+- **Commands**: `<lint>`, `<static analysis>`, `<tests>`
+- **Quality check before commit**: `<quality_check>`

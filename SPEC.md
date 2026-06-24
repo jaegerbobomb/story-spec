@@ -23,17 +23,42 @@ depends_on: [S001, S002]        # Prerequisite stories (empty array if none)
 status: todo                    # See status values below
 estimate: M                     # See estimate values below
 bdd: true                       # true → generates a .feature | false → unit test only
+updated: "2026-06-21"           # Date the story file was last revised (ISO 8601)
 ---
 ```
 
 ### Status values
 
-| Value | Meaning |
-|---|---|
-| `todo` | Not started |
-| `in_progress` | Being implemented (open branch) |
-| `done` | Implemented, tests green, merged |
-| `archived` | Abandoned or obsolete — kept for history |
+The lifecycle uses **six** statuses. Only `done` stories are extracted to
+`.feature` (strict mode); a story in any other status must never break CI
+(local override: `extract_features --all`).
+
+| Value | Meaning | BDD extraction |
+|---|---|---|
+| `todo` | Not started | no |
+| `in_progress` | Being implemented (open branch) | no |
+| `done` | Implemented, tests green, merged | **yes** |
+| `to_extend` | Delivered and merged (`done`), but scoped follow-ups/fixes are pending; the file no longer matches the target (new criteria listed under a "To complete" section). | no |
+| `deferred` | Scoped but postponed (priority or external dependency); stays visible in the backlog. | no |
+| `archived` | Abandoned or obsolete — kept for history. | no |
+
+### Lifecycle
+
+```
+todo ──► in_progress ──► done
+                          │
+                          ├──► to_extend ──► in_progress ──► done
+                          │
+deferred ◄────────────────┘   (postpone)
+   │
+   └──► todo   (reactivation)
+
+(any state) ──► archived
+```
+
+Module-specific frontmatter fields (e.g. `released_in`, added by the
+`release-versioning` module) live in the relevant module, never in the core
+frontmatter above.
 
 ### Estimate values (T-shirt sizing)
 
