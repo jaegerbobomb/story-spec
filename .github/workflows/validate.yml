@@ -5,12 +5,23 @@ on:
     paths:
       - 'examples/stories/**'
       - 'scripts/extract_features.py'
+      - 'scripts/lint_stories.py'
+      - 'scripts/init.sh'
+      - 'core/**'
+      - 'modules/**'
+      - 'CLAUDE.dist.md'
 
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Lint stories (story-lint)
+        run: |
+          python3 scripts/lint_stories.py \
+            --stories-dir=examples/stories \
+            --verbose
 
       - name: Dry-run extraction
         run: |
@@ -27,3 +38,11 @@ jobs:
           count=$(ls /tmp/features/*.feature 2>/dev/null | wc -l)
           echo "Generated $count .feature file(s)"
           [ "$count" -gt 0 ] || { echo "No .feature files generated"; exit 1; }
+
+  module-autonomy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check module autonomy (ADR-0002)
+        run: bash scripts/init.sh --check
