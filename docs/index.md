@@ -4,7 +4,7 @@ layout: home
 
 # StorySpec
 
-**Write the story once. Run it as a test.**
+**Write the story once. Run it as a test. Compose the rest as modules.**
 
 User stories as living specifications - one markdown file, three audiences:
 product owner, developer, CI pipeline.
@@ -24,6 +24,7 @@ epic: auth
 status: done
 estimate: S
 bdd: true
+updated: "2026-06-21"
 ---
 
 ## User story
@@ -56,9 +57,17 @@ The markdown story is the single source of truth.
 
 ---
 
-## Get started
+## Documentation
 
-→ [Getting started guide](getting-started.md)
-→ [Format reference](format.md)
+This documentation follows the [Diátaxis](https://diataxis.fr) framework — four
+modes, each serving a different need:
+
+| Mode | When you want to… | Start here |
+|---|---|---|
+| **Tutorial** | learn by doing, step by step | [Getting started](tutorials/getting-started.md) |
+| **How-to** | accomplish a specific task | [Migrating to the modular kit](how-to/migrating-to-modular.md) |
+| **Reference** | look up exact details | [Format reference](reference/format.md) · [Full spec](https://github.com/jaegerbobomb/story-spec/blob/main/SPEC.md) |
+| **Explanation** | understand the why | [Design & decisions](explanation/) |
+
 → [Story status](status.md)
 → [GitHub repository](https://github.com/jaegerbobomb/story-spec)
