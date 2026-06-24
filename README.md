@@ -3,8 +3,17 @@
 **Write the story once. Run it as a test. Compose the rest as modules.**
 
 User stories as living specifications - one markdown file, three audiences:
-product owner, developer, CI pipeline. StorySpec is now a **modular kit**: a
-small mandatory core plus opt-in modules you compose per project.
+product owner, developer, CI pipeline. StorySpec is a **modular kit**: a small
+mandatory core plus opt-in modules you compose per project.
+
+**It is agent-first.** The format reads like documentation a human can follow,
+but its real job is to make an AI coding agent work with discipline. `SPEC.md`
+defines the *what* (the format); the `kit/` fragments are the *operating contract*
+loaded into the agent's `CLAUDE.md` (or `AGENTS.md`) that **forces** the method:
+a story before any code, tests before implementation, an ADR for every structural
+decision, a changelog and docs on every delivery. The payoff is **quality work
+with end-to-end traceability** — for humans, and especially for agents that would
+otherwise happily skip the discipline. See [Why agent-first](docs/explanation/#why-agent-first).
 
 → [Full specification](SPEC.md)
 → [Getting started](docs/tutorials/getting-started.md)
@@ -75,17 +84,25 @@ declares the modules it wants in a manifest, and `story-spec init` composes the
 `CLAUDE.md`, the SPEC and the scaffolding from the core plus those modules.
 
 ```
-story-spec/
-├── CLAUDE.dist.md          # composition template (@import of core + enabled modules)
+story-spec/                 # ← this repo (the kit's source)
 ├── SPEC.md                 # format spec (lifecycle: 6 statuses, `updated` field)
-├── core/                   # mandatory: core CLAUDE fragment (lifecycle lives in SPEC.md)
-│   └── CLAUDE.core.md
-├── modules/<name>/         # opt-in: CLAUDE.md, SPEC.section.md, templates/, skills/
-├── agents/                 # story-author, story-implementer, spec-guardian
-├── skills/                 # release-bump (+ adr-new shipped by the adr module)
-├── scripts/init.sh         # composer / scaffolder / autonomy linter
+├── README.md  CHANGELOG.md  PHILOSOPHY.md  VERSION
+├── kit/                    # everything that gets vendored into your project
+│   ├── CLAUDE.dist.md      #   composition template (@import of core + enabled modules)
+│   ├── manifest.example.yaml  #   the sample a project copies to .story-spec/manifest.yaml
+│   ├── core/CLAUDE.core.md #   mandatory core fragment (lifecycle lives in SPEC.md)
+│   ├── modules/<name>/     #   opt-in: CLAUDE.md, SPEC.section.md, templates/, skills/
+│   ├── agents/             #   story-author, story-implementer, spec-guardian
+│   └── skills/             #   release-bump (+ adr-new shipped by the adr module)
+├── scripts/                # tooling: install.sh, init.sh, extract_features.py, lint_stories.py…
+├── docs/                   # Diátaxis docs + ADRs
+└── examples/               # example stories
+
+# In YOUR project after install, the kit lives under a single dir:
+your-app/
 └── .story-spec/
-    └── manifest.example.yaml   # declares enabled modules for a project
+    ├── manifest.yaml       # which modules you enabled
+    └── dist/               # the vendored kit (core/, modules/, …) init reads from
 ```
 
 ### Available modules
@@ -100,8 +117,8 @@ story-spec/
 | `docs-diataxis` | organize the app's product docs along the four Diátaxis modes |
 | `visual-review` | screenshots synced to delivered UI stories (tool-agnostic) |
 
-**Module autonomy (ADR-0002):** each `modules/<name>/CLAUDE.md` fragment is
-self-contained — no cross-module `@import`. Only `CLAUDE.dist.md` aggregates.
+**Module autonomy (ADR-0002):** each `kit/modules/<name>/CLAUDE.md` fragment is
+self-contained — no cross-module `@import`. Only `kit/CLAUDE.dist.md` aggregates.
 That is what keeps a module copy-pasteable into a plain `AGENTS.md`.
 `scripts/init.sh --check` enforces this invariant (lint only, non-zero exit on
 violation) and runs in CI.
@@ -127,12 +144,12 @@ curl -fsSL .../install.sh | STORY_SPEC_NO_INIT=1 bash
 
 Prefer not to pipe to a shell? Alternatives:
 
-- **git subtree** — `git subtree add --prefix .story-spec/dist https://github.com/jaegerbobomb/story-spec main --squash`, then copy the scripts you need and run `bash .story-spec/dist/scripts/init.sh`.
-- **Manual** — download/clone the repo and run `STORY_SPEC_DIST=path/to/story-spec bash path/to/story-spec/scripts/init.sh` from your project root.
+- **git subtree** — `git subtree add --prefix vendor/story-spec https://github.com/jaegerbobomb/story-spec main --squash`, then `STORY_SPEC_DIST=vendor/story-spec/kit bash vendor/story-spec/scripts/init.sh` from your project root.
+- **Manual** — clone the repo, then `STORY_SPEC_DIST=path/to/story-spec/kit bash path/to/story-spec/scripts/init.sh`.
 
 ## Quick start
 
-After installing (or from a clone of this repo):
+After installing (or, from a clone of this repo, `cp kit/manifest.example.yaml .story-spec/manifest.yaml` first):
 
 ```bash
 # 1. Declare the modules you want for your project

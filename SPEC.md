@@ -56,9 +56,19 @@ deferred ◄────────────────┘   (postpone)
 (any state) ──► archived
 ```
 
-Module-specific frontmatter fields (e.g. `released_in`, added by the
-`release-versioning` module) live in the relevant module, never in the core
-frontmatter above.
+### Optional module fields
+
+Some modules add optional frontmatter fields (they live in the module, never in the
+core block above):
+
+| Field | Module | Meaning |
+|---|---|---|
+| `adr` | `adr` | List of ADR numbers governing this story, e.g. `adr: [1, 7]`. The story↔decision back-reference (the ADR lists `Related stories`). |
+| `released_in` | `release-versioning` | The version/tag the story shipped in. |
+
+When the `adr` module is enabled, **a story whose behaviour is shaped by a structural
+decision must reference that ADR** via `adr: [...]` (or cite it under `## Notes`), so
+the trace story → decision is never lost.
 
 ### Estimate values (T-shirt sizing)
 
