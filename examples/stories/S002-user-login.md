@@ -6,6 +6,8 @@ depends_on: [S001]
 status: done
 estimate: S
 bdd: true
+updated: "2026-06-21"
+adr: []
 ---
 
 ## User story

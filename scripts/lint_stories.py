@@ -15,6 +15,7 @@ Checks (ERROR fails the run, WARN is informational unless --strict):
   - bdd: true  =>  at least one scenario with steps under "## Acceptance Criteria"
   - updated present and ISO 8601 (YYYY-MM-DD)            [WARN]
   - depends_on ids resolve to a story in the same dir    [WARN]
+  - adr ids (adr module) are integers                    [WARN]
   - title <= 8 words                                     [WARN]
 
 Usage:
@@ -150,6 +151,10 @@ def main() -> int:
         for dep in fm.get('depends_on', []) or []:
             if dep not in known_ids:
                 warn(name, f'depends_on `{dep}` not found in {stories_dir}')
+
+        for ref in fm.get('adr', []) or []:
+            if not str(ref).isdigit():
+                warn(name, f'adr `{ref}` should be an ADR number (integer)')
 
         title = fm.get('title', '')
         if title and len(title.split()) > 8:

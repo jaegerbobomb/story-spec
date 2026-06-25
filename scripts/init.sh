@@ -15,13 +15,13 @@ ROOT="${STORY_SPEC_ROOT:-$(pwd)}"
 # Source kit ("dist"). Resolution order:
 #   1. $STORY_SPEC_DIST if set
 #   2. a vendored kit at $ROOT/.story-spec/dist (installed projects)
-#   3. the kit checkout this script lives in (running from the story-spec repo)
+#   3. the kit/ catalog in the story-spec repo this script lives in
 if [ -n "${STORY_SPEC_DIST:-}" ]; then
   DIST="$STORY_SPEC_DIST"
 elif [ -d "$ROOT/.story-spec/dist/core" ]; then
   DIST="$ROOT/.story-spec/dist"
 else
-  DIST="$(cd "$(dirname "$0")/.." && pwd)"
+  DIST="$(cd "$(dirname "$0")/.." && pwd)/kit"
 fi
 MANIFEST="$ROOT/.story-spec/manifest.yaml"
 DRY=0; SYNC=0; CHECK=0

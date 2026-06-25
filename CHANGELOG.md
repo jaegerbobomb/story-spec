@@ -6,6 +6,30 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-24
+
+Agent-first framing, story↔ADR traceability, and a cleaner repo layout.
+
+### Added
+- **Story → ADR traceability**: optional `adr: [NNNN]` frontmatter field
+  (provided by the `adr` module) documented in `SPEC.md`, added to the story
+  template and examples, and checked by `story-lint`. Back-reference: ADRs carry
+  a `Related stories` field.
+- **ADR-0003**: group the distributable catalog under `kit/`.
+
+### Changed
+- **Repo layout (ADR-0003)**: everything vendored into a project is grouped under
+  `kit/` (`core/`, `modules/`, `agents/`, `skills/`, `templates/`,
+  `CLAUDE.dist.md`, `manifest.example.yaml`). `scripts/` stays at the root.
+  `.story-spec/` now exists **only** in a consumer project.
+- **Agent-first framing**: README and `core/CLAUDE.core.md` make explicit that the
+  `kit/` fragments are an *operating contract* that forces an agent to follow the
+  method (story → red→green → ADR → changelog → docs), not mere documentation.
+  New "Why agent-first" section under `docs/explanation/`.
+- **Tooling paths**: `scripts/init.sh` resolves its source as `$STORY_SPEC_DIST` →
+  `.story-spec/dist` → `<repo>/kit`; `install.sh` and the CI path filters updated
+  for the `kit/` layout.
+
 ## [0.1.0] - 2026-06-23
 
 First release of StorySpec as a **modular kit** (core + opt-in modules).
@@ -38,5 +62,6 @@ Dogfoods its own [ADR](docs/adr/) and release discipline.
   docs, visual-review) before closing a story (`core/CLAUDE.core.md`).
 - **README** rewritten around the modular kit; docs reorganized along Diátaxis.
 
-[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jaegerbobomb/story-spec/releases/tag/v0.1.0

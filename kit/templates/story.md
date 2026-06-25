@@ -6,6 +6,8 @@ depends_on: []
 status: todo
 estimate: S
 bdd: true
+updated: "YYYY-MM-DD"
+adr: []                  # optional (adr module): ADR numbers governing this story
 ---
 
 ## User story
