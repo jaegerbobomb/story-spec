@@ -3,3 +3,6 @@ __pycache__/
 
 # Generated BDD artifacts
 tests/features/*.feature
+
+# Session-local scratch (Claude Code remote env)
+scratchpad/
