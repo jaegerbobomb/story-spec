@@ -19,6 +19,9 @@ YELLOW='\033[33m'
 WHITE='\033[37m'
 RED='\033[31m'
 CYAN='\033[36m'
+BLUE='\033[34m'
+MAGENTA='\033[35m'
+GREY='\033[90m'
 RESET='\033[0m'
 
 printf "${CYAN}%-8s %-12s %-6s %-10s %s${RESET}\n" "ID" "STATUS" "BDD" "ESTIMATE" "TITLE"
@@ -39,11 +42,18 @@ for f in "${files[@]}"; do
     estimate=$(grep -m1 '^estimate:' "$f" | sed 's/estimate: *//')
     title=$(grep -m1 '^title:'   "$f" | sed 's/title: *//;s/"//g')
 
+    # Red is reserved for a status the lifecycle does not define — an unknown
+    # status is the only thing worth flagging as an error here.
     case "$status" in
-        done)        color="$GREEN"  ;;
-        in_progress) color="$YELLOW" ;;
-        todo)        color="$WHITE"  ;;
-        *)           color="$RED"    ;;
+        done)        color="$GREEN"   ;;
+        in_progress) color="$YELLOW"  ;;
+        todo)        color="$WHITE"   ;;
+        proposed)    color="$BLUE"    ;;
+        split)       color="$MAGENTA" ;;
+        to_extend)   color="$CYAN"    ;;
+        deferred)    color="$GREY"    ;;
+        archived)    color="$GREY"    ;;
+        *)           color="$RED"     ;;
     esac
 
     printf "${color}%-8s %-12s %-6s %-10s %s${RESET}\n" \

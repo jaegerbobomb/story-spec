@@ -85,7 +85,7 @@ declares the modules it wants in a manifest, and `story-spec init` composes the
 
 ```
 story-spec/                 # ← this repo (the kit's source)
-├── SPEC.md                 # format spec (lifecycle: 6 statuses, `updated` field)
+├── SPEC.md                 # format spec (lifecycle: 8 statuses, sub-story ids, `updated` field)
 ├── README.md  CHANGELOG.md  PHILOSOPHY.md  VERSION
 ├── kit/                    # everything that gets vendored into your project
 │   ├── CLAUDE.dist.md      #   composition template (@import of core + enabled modules)
@@ -94,7 +94,7 @@ story-spec/                 # ← this repo (the kit's source)
 │   ├── modules/<name>/     #   opt-in: CLAUDE.md, SPEC.section.md, templates/, skills/
 │   ├── agents/             #   story-author, story-implementer, spec-guardian
 │   └── skills/             #   release-bump (+ adr-new shipped by the adr module)
-├── scripts/                # tooling: install.sh, init.sh, extract_features.py, lint_stories.py…
+├── scripts/                # tooling: install.sh, init.sh, extract_features.py, lint_stories.py, next_story_id.py…
 ├── docs/                   # Diátaxis docs + ADRs
 └── examples/               # example stories
 
@@ -159,13 +159,16 @@ $EDITOR .story-spec/manifest.yaml      # pick modules, agents, skills, test adap
 bash scripts/init.sh --dry-run
 bash scripts/init.sh
 
-# 3. Write the story, fill in the Acceptance Criteria, then lint it
+# 3. Take a free number (reads every git ref, not just this branch)
+git fetch --all --prune && python3 scripts/next_story_id.py --verbose
+
+# 4. Write the story, fill in the Acceptance Criteria, then lint it
 python3 scripts/lint_stories.py --stories-dir=stories
 
-# 4. Generate .feature files before running your BDD suite
+# 5. Generate .feature files before running your BDD suite
 python3 scripts/extract_features.py
 
-# 5. Run Behat / Cucumber as usual
+# 6. Run Behat / Cucumber as usual
 ```
 
 Re-run `bash scripts/init.sh --sync` after editing the manifest to recompose
@@ -179,6 +182,7 @@ Re-run `bash scripts/init.sh --sync` after editing the manifest to recompose
 | `scripts/init.sh` | Bash | Compose `CLAUDE.md` + scaffold core/modules from the manifest (`--dry-run`, `--sync`, `--check`) |
 | `scripts/extract_features.py` | Python 3 (stdlib) | Story → `.feature` generator |
 | `scripts/lint_stories.py` | Python 3 (stdlib) | Validate story files (`story-lint`; `--strict`) |
+| `scripts/next_story_id.py` | Python 3 (stdlib) | Next free story number, across every git ref |
 | `scripts/generate_report.py` | Python 3 (stdlib) | Markdown status report for GitHub Pages |
 | `scripts/stories_status.sh` | Bash | Colour-coded terminal dashboard |
 | `scripts/ports/php/extract_features.php` | PHP 8+ | PHP port for projects that already have PHP |

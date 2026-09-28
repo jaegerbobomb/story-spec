@@ -1,7 +1,7 @@
 # Stories
 
 This directory contains the user story files for this project, following the
-[StorySpec](https://github.com/TODO/storyspec) convention.
+[StorySpec](https://github.com/jaegerbobomb/story-spec) convention.
 
 ## Format
 
@@ -13,7 +13,7 @@ id: S001
 title: "Short title"
 epic: feature-area
 depends_on: []
-status: todo        # todo | in_progress | done | archived
+status: proposed    # proposed | todo | in_progress | done | split | to_extend | deferred | archived
 estimate: S         # XS | S | M | L | XL
 bdd: true           # true → .feature generated | false → unit tests
 ---
@@ -34,14 +34,17 @@ Acceptance criteria use Gherkin embedded in markdown:
 
 ## Workflow
 
-1. Create `S<NNN>-<slug>.md` with `status: todo` - get it validated before coding.
-2. Check `depends_on` stories are `done`.
-3. If `bdd: true`: run `python3 scripts/extract_features.py` to generate `.feature` → write step definitions → red.
-4. If `bdd: false`: write unit/integration tests directly → red.
-5. Implement (green). Refactor (still green).
-6. Commit: `feat(S<NNN>): <short slug>`. Set `status: done`.
+1. Take the number: `git fetch --all --prune && python3 scripts/next_story_id.py`.
+2. Create `S<NNN>-<slug>.md` with `status: proposed` — get it validated, then `todo`.
+3. Check `depends_on` stories are `done`.
+4. If `bdd: true`: run `python3 scripts/extract_features.py` to generate `.feature` → write step definitions → red.
+5. If `bdd: false`: write unit/integration tests directly → red.
+6. Implement (green). Refactor (still green).
+7. Commit: `feat(S<NNN>): <short slug>`. Set `status: done`.
 
-**Stop and split** if a story exceeds one effective day or 300 lines of production code.
+**Stop and split** if a story exceeds one effective day or 300 lines of production
+code: children are `S<NNN>a`, `S<NNN>b` (same number, plus a letter) and the parent
+moves to `status: split`.
 
 ## Index
 
@@ -53,10 +56,14 @@ bash scripts/stories_status.sh
 
 | Field | Rule |
 |---|---|
-| `id` | `S` + 3 digits, sequential, never reused |
+| `id` | `S` + 3 digits, sequential, never reused — `python3 scripts/next_story_id.py` |
 | filename | `S<NNN>-<slug>.md` |
+| sub-story | `S<NNN><letter>` (`S001a`) — reuses the parent's number |
 | `slug` | kebab-case, ≤ 5 words |
 | `epic` | one word or kebab-case |
+
+Do not keep a hand-written list of reserved ids: it drifts, and it cannot see the
+stories being written on other branches — which is where collisions come from.
 
 ## Generated artifacts
 

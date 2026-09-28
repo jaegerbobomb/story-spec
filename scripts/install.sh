@@ -44,7 +44,7 @@ cp -R "$src/kit/core" "$src/kit/modules" "$src/kit/agents" "$src/kit/skills" "$s
 
 # 2) Copy the scripts the project calls directly.
 mkdir -p "$ROOT/scripts"
-for s in extract_features.py lint_stories.py stories_status.sh generate_report.py init.sh; do
+for s in extract_features.py lint_stories.py next_story_id.py stories_status.sh generate_report.py init.sh; do
   [ -f "$src/scripts/$s" ] && cp "$src/scripts/$s" "$ROOT/scripts/$s"
 done
 chmod +x "$ROOT/scripts/init.sh" 2>/dev/null || true

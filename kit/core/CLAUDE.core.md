@@ -7,8 +7,19 @@
 ## Absolute rule — propose the story first
 
 Before any feature development, propose a `stories/S<NNN>-<slug>.md` story
-in story-spec format and **wait for human validation**. Only exceptions: urgent
-bug fixes and micro-refactors with no functional impact.
+in story-spec format with **`status: proposed`**, and **wait for human validation**
+(validation moves it to `todo`). Only exceptions: urgent bug fixes and micro-refactors
+with no functional impact.
+
+**Take the number with the tool, never from memory or from a list:**
+
+```bash
+git fetch --all --prune && python3 scripts/next_story_id.py --verbose
+```
+
+It reads the story files of **every git ref**, not just the working tree. A story
+being written on another branch already owns its number; deducing the free number
+from `main` alone is how two sessions on the same day pick the same one.
 
 ## Per-story loop
 
@@ -28,7 +39,10 @@ bug fixes and micro-refactors with no functional impact.
 10. Move the story to `status: done`.
 
 **Size**: if the story exceeds ~1 day or ~300 lines of prod code, **stop without committing**,
-propose a split (`S<NNN>a`, `S<NNN>b`) and wait for validation.
+propose a split (`S<NNN>a`, `S<NNN>b`) and wait for validation. The children take the
+parent's number plus a letter — no new number is consumed — and the parent moves to
+**`status: split`**: it keeps the framing and the decision log, the children carry the
+work.
 
 **Ambiguity**: ask a question before coding; record the answer under `## Notes`.
 
