@@ -15,7 +15,15 @@ stories/S<NNN>-<slug>.md
 | Part | Rule |
 |---|---|
 | `S<NNN>` | Sequential integer, zero-padded to 3 digits. Never reused, even after deletion. |
+| `<letter>` | Optional sub-story marker (`S006a`) — reuses the parent's number |
 | `<slug>` | kebab-case, ≤ 5 words (`user-registration`, not `registration`) |
+
+The next free number comes from the tool, which reads every git ref — a story being
+written on another branch already owns its number:
+
+```bash
+git fetch --all --prune && python3 scripts/next_story_id.py --verbose
+```
 
 ## Frontmatter
 
@@ -25,7 +33,7 @@ id: S006
 title: "Short title"
 epic: auth
 depends_on: [S001, S002]
-status: todo
+status: proposed
 estimate: M
 bdd: true
 ---
@@ -33,11 +41,11 @@ bdd: true
 
 | Field | Required | Values |
 |---|---|---|
-| `id` | Yes | `S` + 3 digits |
+| `id` | Yes | `S` + 3 digits, optionally + a sub-story letter |
 | `title` | Yes | String, ≤ 8 words |
 | `epic` | Yes | one word or kebab-case |
 | `depends_on` | Yes | Array of IDs, or `[]` |
-| `status` | Yes | `todo` · `in_progress` · `done` · `archived` |
+| `status` | Yes | `proposed` · `todo` · `in_progress` · `done` · `split` · `to_extend` · `deferred` · `archived` |
 | `estimate` | Yes | `XS` · `S` · `M` · `L` · `XL` |
 | `bdd` | Yes | `true` · `false` |
 

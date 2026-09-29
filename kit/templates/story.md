@@ -3,7 +3,7 @@ id: S000
 title: "Short title (5 words max)"
 epic: my-epic
 depends_on: []
-status: todo
+status: proposed         # awaiting human validation → todo once validated
 estimate: S
 bdd: true
 updated: "YYYY-MM-DD"

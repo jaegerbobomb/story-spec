@@ -6,8 +6,11 @@ on:
       - 'examples/stories/**'
       - 'scripts/extract_features.py'
       - 'scripts/lint_stories.py'
+      - 'scripts/next_story_id.py'
+      - 'scripts/generate_report.py'
       - 'scripts/init.sh'
       - 'kit/**'
+      - 'SPEC.md'
 
 jobs:
   validate:
@@ -20,6 +23,60 @@ jobs:
           python3 scripts/lint_stories.py \
             --stories-dir=examples/stories \
             --verbose
+
+      - name: Lifecycle and sub-story grammar are accepted (ADR-0004)
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, sys, tempfile
+
+          BODY = '''---
+          id: {id}
+          title: "Lifecycle fixture"
+          epic: fixture
+          depends_on: []
+          status: {status}
+          estimate: S
+          bdd: false
+          updated: "2026-09-28"
+          ---
+
+          ## User story
+
+          > **As a** maintainer, **I want** every status accepted, **so that** the
+          > spec and the linter agree.
+          '''
+
+          STATUSES = ["proposed", "todo", "in_progress", "done",
+                      "split", "to_extend", "deferred", "archived"]
+
+          d = pathlib.Path(tempfile.mkdtemp())
+          for n, status in enumerate(STATUSES, start=1):
+              sid = f"S{n:03d}"
+              (d / f"{sid}-a-story.md").write_text(BODY.format(id=sid, status=status))
+          # A sub-story reuses its parent's number plus one lowercase letter.
+          (d / "S001a-a-sub-story.md").write_text(BODY.format(id="S001a", status="todo"))
+
+          sys.exit(subprocess.call(
+              [sys.executable, "scripts/lint_stories.py",
+               f"--stories-dir={d}", "--verbose", "--strict"]))
+          PY
+
+      - name: An unknown status still fails
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, sys, tempfile
+
+          d = pathlib.Path(tempfile.mkdtemp())
+          (d / "S001-bad-status.md").write_text(
+              '---\nid: S001\ntitle: "Bad status"\nepic: fixture\n'
+              'depends_on: []\nstatus: almost_done\nestimate: S\nbdd: false\n'
+              'updated: "2026-09-28"\n---\n')
+
+          rc = subprocess.call(
+              [sys.executable, "scripts/lint_stories.py", f"--stories-dir={d}"])
+          if rc == 0:
+              sys.exit("linter accepted an unknown status")
+          PY
 
       - name: Dry-run extraction
         run: |

@@ -6,17 +6,18 @@ Validates that every story file is well-formed before implementation — the
 "third audience: CI" applied to the spec itself. Stdlib only, no dependencies.
 
 Checks (ERROR fails the run, WARN is informational unless --strict):
-  - filename matches  S<NNN>-<kebab-slug>.md
+  - filename matches  S<NNN>[<suffix>]-<kebab-slug>.md
   - frontmatter present, with required keys: id, title, epic, depends_on,
     status, estimate, bdd
-  - id is S<NNN> and matches the filename prefix
-  - status in todo|in_progress|done|to_extend|deferred|archived
+  - id is S<NNN>[<suffix>] and matches the filename prefix
+  - status in proposed|todo|in_progress|done|split|to_extend|deferred|archived
   - estimate in XS|S|M|L|XL ; bdd in true|false
   - bdd: true  =>  at least one scenario with steps under "## Acceptance Criteria"
   - updated present and ISO 8601 (YYYY-MM-DD)            [WARN]
   - depends_on ids resolve to a story in the same dir    [WARN]
   - adr ids (adr module) are integers                    [WARN]
   - title <= 8 words                                     [WARN]
+  - sub-story nested beyond one level (S006a1)           [WARN]
 
 Usage:
     python3 lint_stories.py [--stories-dir=stories] [--verbose] [--strict]
@@ -26,12 +27,20 @@ import re
 import sys
 from pathlib import Path
 
-STATUSES = {'todo', 'in_progress', 'done', 'to_extend', 'deferred', 'archived'}
+STATUSES = {
+    'proposed', 'todo', 'in_progress', 'done',
+    'split', 'to_extend', 'deferred', 'archived',
+}
 ESTIMATES = {'XS', 'S', 'M', 'L', 'XL'}
 REQUIRED = ['id', 'title', 'epic', 'depends_on', 'status', 'estimate', 'bdd']
 
-FILENAME_RE = re.compile(r'^S\d{3}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$')
-ID_RE = re.compile(r'^S\d{3}$')
+# A sub-story carries its parent's number plus one lowercase letter (S006a), so it
+# consumes no new number. A second level (S006a1) parses but is warned about — see
+# SPEC.md § Sub-stories.
+SUFFIX = r'(?:[a-z]\d*)?'
+FILENAME_RE = re.compile(rf'^S\d{{3}}{SUFFIX}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$')
+ID_RE = re.compile(rf'^S\d{{3}}{SUFFIX}$')
+NESTED_SUFFIX_RE = re.compile(r'^S\d{3}[a-z]\d')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
 
@@ -113,7 +122,9 @@ def main() -> int:
         fm, present = parse_frontmatter(content)
 
         if not FILENAME_RE.match(name):
-            err(name, 'filename must match S<NNN>-<kebab-slug>.md')
+            err(name, 'filename must match S<NNN>[<suffix>]-<kebab-slug>.md')
+        elif NESTED_SUFFIX_RE.match(name):
+            warn(name, 'sub-story nested beyond one level — split the parent more finely')
         if not present:
             err(name, 'missing or unterminated YAML frontmatter')
             continue
@@ -124,7 +135,7 @@ def main() -> int:
 
         sid = fm.get('id', '')
         if sid and not ID_RE.match(sid):
-            err(name, f'id `{sid}` must be S<NNN>')
+            err(name, f'id `{sid}` must be S<NNN>[<suffix>]')
         elif sid and not name.startswith(sid + '-'):
             err(name, f'id `{sid}` does not match filename prefix')
 

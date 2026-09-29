@@ -41,7 +41,19 @@ def parse_frontmatter(content: str) -> dict:
     return result
 
 
-BADGE = {'done': '✅', 'in_progress': '🔄', 'todo': '⬜', 'archived': '🗄️'}
+# A story whose status is not one of these is still listed (with `❓`) and still
+# counted in the total — a story the report cannot classify must not silently
+# vanish from the denominator.
+BADGE = {
+    'proposed':    '💡',
+    'todo':        '⬜',
+    'in_progress': '🔄',
+    'done':        '✅',
+    'split':       '🔀',
+    'to_extend':   '➕',
+    'deferred':    '⏸️',
+    'archived':    '🗄️',
+}
 
 
 def main() -> int:
@@ -53,7 +65,8 @@ def main() -> int:
         return 1
 
     rows   = []
-    counts = {'done': 0, 'in_progress': 0, 'todo': 0, 'archived': 0}
+    counts = {status: 0 for status in BADGE}
+    unknown = 0
 
     for file in files:
         fm     = parse_frontmatter(file.read_text(encoding='utf-8'))
@@ -66,10 +79,19 @@ def main() -> int:
         )
         if status in counts:
             counts[status] += 1
+        else:
+            unknown += 1
 
-    total    = sum(counts.values())
+    total    = sum(counts.values()) + unknown
     done     = counts['done']
     progress = round(done / total * 100) if total else 0
+
+    header  = ' | '.join(f'{BADGE[s]} {s}' for s in BADGE)
+    figures = ' | '.join(str(counts[s]) for s in BADGE)
+    if unknown:
+        header += ' | ❓ unknown'
+        figures += f' | {unknown}'
+    columns = '|---' * (len(BADGE) + 1 + bool(unknown)) + '|'
 
     md = f"""\
 # Story Status
@@ -78,9 +100,9 @@ Generated: {date.today().isoformat()}
 
 **{done}/{total} done ({progress}%)**
 
-| | ✅ Done | 🔄 In progress | ⬜ Todo | 🗄️ Archived |
-|---|---|---|---|---|
-| Count | {counts['done']} | {counts['in_progress']} | {counts['todo']} | {counts['archived']} |
+| | {header} |
+{columns}
+| Count | {figures} |
 
 ---
 

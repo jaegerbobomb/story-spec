@@ -13,7 +13,7 @@ invalidated, and you can stop after any step.
 |---|---|
 | monolithic `CLAUDE.dist.md` copied as-is | `CLAUDE.md` **composed** from the core + declared modules |
 | Universal and specific conventions mixed | Invariant core + opt-in modules + "Project-specific" block |
-| 4 statuses (`todo, in_progress, done, archived`) | 6 statuses (+ `to_extend`, `deferred`) |
+| 4 statuses (`todo, in_progress, done, archived`) | 8 statuses (+ `proposed`, `split`, `to_extend`, `deferred`) |
 | No date field | `updated` frontmatter field (ISO 8601) |
 | No manifest | `.story-spec/manifest.yaml` declares modules/agents/skills |
 | Implicit tooling choice | explicit `test_adapter` (behat/pytest/vitest/none) |
