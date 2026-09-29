@@ -6,6 +6,26 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-09-29
+
+### Fixed
+- **A story that mentions `## Acceptance Criteria` in prose lost every scenario.**
+  Both extractors and the linter located the section with a plain substring search, so
+  the first *mention* of the heading — inside a sentence or inside a Gherkin step —
+  truncated the section before the real heading. The extractor then wrote nothing and
+  reported `[skip] … (no scenarios found)`; the linter reported `bdd: true but no
+  scenario`. Both are now anchored to the start of a line, and when several headings
+  match, the first non-empty section wins. Fixed in `scripts/extract_features.py`,
+  `scripts/lint_stories.py` and the PHP port, which stay in parity.
+
+  A story *about* the extraction script trips this by nature — which is how it was
+  found, on a consumer project whose `S041` silently lost its 8 scenarios to the
+  upstream extractor while the project's own implementation produced them correctly.
+
+  CI now carries the case: a fixture story naming the heading in prose must keep its
+  scenario, through the linter *and* the extractor. The step fails on the previous
+  code.
+
 ## [0.3.0] - 2026-09-28
 
 Sub-stories become legal, the lifecycle gains the two states it was missing, and the
@@ -155,7 +175,8 @@ Dogfoods its own [ADR](docs/adr/) and release discipline.
   docs, visual-review) before closing a story (`core/CLAUDE.core.md`).
 - **README** rewritten around the modular kit; docs reorganized along Diátaxis.
 
-[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/jaegerbobomb/story-spec/releases/tag/v0.1.0
