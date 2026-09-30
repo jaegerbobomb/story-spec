@@ -83,16 +83,24 @@ def parse_frontmatter(content: str):
     return result, True
 
 
+#: Same anchoring as the extractor: the heading counts only at the start of a line.
+#: A story may mention "## Acceptance Criteria" inside a sentence or a Gherkin step,
+#: and a plain substring search then cuts the section short at that mention — the
+#: linter reports "no scenario" on a story that has several, and the extractor
+#: silently produces nothing. Keep the two in step.
+AC_HEADING_RE = re.compile(r'^## Acceptance Criteria[ \t]*$', re.M)
+
+
 def has_scenarios(content: str) -> bool:
-    start = content.find('## Acceptance Criteria')
-    if start == -1:
-        return False
-    rest = content[start + len('## Acceptance Criteria'):]
-    m = re.search(r'\n## ', rest)
-    section = rest[:m.start()] if m else rest
-    has_title = re.search(r'^###\s+Scenario:\s+.+$', section, re.M)
-    has_step = re.search(r'^\*\s+\*\*(Given|When|Then|And|But)\*\*\s+.+$', section, re.M)
-    return bool(has_title and has_step)
+    for match in AC_HEADING_RE.finditer(content):
+        rest = content[match.end():]
+        end = re.search(r'^## ', rest, re.M)
+        section = rest[:end.start()] if end else rest
+        has_title = re.search(r'^###\s+Scenario:\s+.+$', section, re.M)
+        has_step = re.search(r'^\*\s+\*\*(Given|When|Then|And|But)\*\*\s+.+$', section, re.M)
+        if has_title and has_step:
+            return True
+    return False
 
 
 def main() -> int:

@@ -121,16 +121,38 @@ function parseFrontmatter(string $content): array
     return $result;
 }
 
+/**
+ * The text under the `## Acceptance Criteria` heading, or null if absent.
+ *
+ * The heading counts only at the **start of a line**: a story may legitimately
+ * mention "## Acceptance Criteria" inside a sentence or a Gherkin step (a story
+ * about the extractor itself does), and a plain substring search would then cut
+ * the section short at that mention — losing every scenario, silently.
+ * Parity with the Python extractor.
+ */
+function acceptanceCriteriaSection(string $content): ?string
+{
+    if (!preg_match_all('/^## Acceptance Criteria[ \t]*$/mu', $content, $m, PREG_OFFSET_CAPTURE)) {
+        return null;
+    }
+    foreach ($m[0] as [$heading, $offset]) {
+        $rest    = substr($content, $offset + strlen($heading));
+        $nextH2  = preg_match('/^## /mu', $rest, $next, PREG_OFFSET_CAPTURE);
+        $section = $nextH2 ? substr($rest, 0, $next[0][1]) : $rest;
+        if (trim($section) !== '') {
+            return $section;
+        }
+    }
+    return null;
+}
+
 /** @return list<array{title: string, steps: list<array{keyword: string, text: string}>}> */
 function extractScenarios(string $content): array
 {
-    $start = strpos($content, '## Acceptance Criteria');
-    if ($start === false) {
+    $section = acceptanceCriteriaSection($content);
+    if ($section === null) {
         return [];
     }
-    $rest    = substr($content, $start + strlen('## Acceptance Criteria'));
-    $nextH2  = preg_match('/\n## /u', $rest, $m, PREG_OFFSET_CAPTURE);
-    $section = $nextH2 ? substr($rest, 0, $m[0][1]) : $rest;
 
     $scenarios = [];
     $current   = null;

@@ -78,6 +78,56 @@ jobs:
               sys.exit("linter accepted an unknown status")
           PY
 
+      - name: A story that mentions the heading in prose keeps its scenarios
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, sys, tempfile
+
+          # The prose mention below used to truncate the section: the extractor
+          # produced nothing and the linter reported "no scenario".
+          STORY = '''---
+          id: S001
+          title: "Extractor fixture"
+          epic: fixture
+          depends_on: []
+          status: done
+          estimate: S
+          bdd: true
+          updated: "2026-09-29"
+          ---
+
+          ## Description
+
+          The script reads the scenarios under `## Acceptance Criteria` and writes a
+          `.feature` file.
+
+          ## Acceptance Criteria
+
+          ### Scenario: The prose mention does not truncate the section
+
+          * **Given** a story naming `## Acceptance Criteria` inside a sentence
+          * **When** the extractor runs
+          * **Then** the scenario below this heading is still found
+          '''
+
+          d = pathlib.Path(tempfile.mkdtemp())
+          (d / "S001-extractor-fixture.md").write_text(STORY)
+          out = pathlib.Path(tempfile.mkdtemp())
+
+          if subprocess.call([sys.executable, "scripts/lint_stories.py",
+                              f"--stories-dir={d}"]):
+              sys.exit("linter lost the scenarios of a story that mentions the heading")
+
+          subprocess.check_call([sys.executable, "scripts/extract_features.py",
+                                 f"--stories-dir={d}", f"--output-dir={out}", "--verbose"])
+          features = list(out.glob("*.feature"))
+          if not features:
+              sys.exit("extractor produced nothing for a story that has a scenario")
+          text = features[0].read_text()
+          if "Scenario: The prose mention does not truncate the section" not in text:
+              sys.exit(f"scenario missing from the generated feature:\n{text}")
+          PY
+
       - name: Dry-run extraction
         run: |
           python3 scripts/extract_features.py \

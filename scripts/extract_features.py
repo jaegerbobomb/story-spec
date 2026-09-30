@@ -55,14 +55,32 @@ def parse_frontmatter(content: str) -> dict:
     return result
 
 
-def extract_scenarios(content: str) -> list:
-    start = content.find('## Acceptance Criteria')
-    if start == -1:
-        return []
+#: The heading must be matched at the **start of a line**. A story may legitimately
+#: mention "## Acceptance Criteria" inside a sentence or a Gherkin step (a story about
+#: the extractor itself does), and a plain substring search would then cut the section
+#: short at that mention — losing every scenario, silently.
+AC_HEADING_RE = re.compile(r'^## Acceptance Criteria[ \t]*$', re.M)
 
-    rest = content[start + len('## Acceptance Criteria'):]
-    m = re.search(r'\n## ', rest)
-    section = rest[:m.start()] if m else rest
+
+def acceptance_criteria_section(content: str) -> str | None:
+    """The text under the `## Acceptance Criteria` heading, or None if absent.
+
+    Runs to the next level-2 heading. When several headings match, the first one
+    whose section is non-empty wins.
+    """
+    for match in AC_HEADING_RE.finditer(content):
+        rest = content[match.end():]
+        end = re.search(r'^## ', rest, re.M)
+        section = rest[:end.start()] if end else rest
+        if section.strip():
+            return section
+    return None
+
+
+def extract_scenarios(content: str) -> list:
+    section = acceptance_criteria_section(content)
+    if section is None:
+        return []
 
     scenarios, current = [], None
     step_re = re.compile(r'^\*\s+\*\*(Given|When|Then|And|But)\*\*\s+(.+)$')
