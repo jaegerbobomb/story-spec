@@ -128,6 +128,46 @@ jobs:
               sys.exit(f"scenario missing from the generated feature:\n{text}")
           PY
 
+      - name: Estimate is required while the work is ahead, optional after (ADR-0005)
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, sys, tempfile
+
+          STORY = '''---
+          id: {id}
+          title: "Estimate fixture"
+          epic: fixture
+          depends_on: []
+          status: {status}
+          bdd: false
+          updated: "2026-09-30"
+          ---
+
+          ## User story
+
+          > **As a** maintainer, **I want** estimate demanded only where it informs,
+          > **so that** nobody reconstructs a forecast after delivery.
+          '''
+
+          def lint(statuses):
+              d = pathlib.Path(tempfile.mkdtemp())
+              for n, status in enumerate(statuses, start=1):
+                  sid = f"S{n:03d}"
+                  (d / f"{sid}-a-story.md").write_text(STORY.format(id=sid, status=status))
+              return subprocess.call(
+                  [sys.executable, "scripts/lint_stories.py", f"--stories-dir={d}"])
+
+          # No estimate, and the work is behind us: accepted.
+          if lint(["done", "split", "to_extend", "deferred", "archived"]):
+              sys.exit("estimate demanded on a status where the work is not ahead")
+
+          # No estimate, and the work is ahead: rejected, one status at a time so a
+          # single lenient status cannot hide behind a strict neighbour.
+          for status in ("proposed", "todo", "in_progress"):
+              if lint([status]) == 0:
+                  sys.exit(f"estimate not demanded on `{status}`")
+          PY
+
       - name: Dry-run extraction
         run: |
           python3 scripts/extract_features.py \

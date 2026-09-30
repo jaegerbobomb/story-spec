@@ -14,13 +14,18 @@ title: "Short title"
 epic: feature-area
 depends_on: []
 status: proposed    # proposed | todo | in_progress | done | split | to_extend | deferred | archived
-estimate: S         # XS | S | M | L | XL
+estimate: S         # XS | S | M | L | XL — required on proposed/todo/in_progress
 bdd: true           # true → .feature generated | false → unit tests
 ---
 ```
 
 Followed by sections: `## User story`, `## Diagram` (optional),
 `## Technical description` (optional), `## Acceptance Criteria`, `## Notes` (optional).
+
+`estimate` is a **planning** field: required while the work is still ahead
+(`proposed`, `todo`, `in_progress`), optional once the story is `done`, `split`,
+`to_extend`, `deferred` or `archived`. Don't fill it in after delivery — it would
+reconstruct a forecast nobody made.
 
 Acceptance criteria use Gherkin embedded in markdown:
 
