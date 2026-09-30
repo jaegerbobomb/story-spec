@@ -50,7 +50,7 @@ title: "Short title"            # Human-readable, ≤ 8 words
 epic: auth                      # Logical group (one word or kebab-case)
 depends_on: [S001, S002]        # Prerequisite stories (empty array if none)
 status: proposed                # See status values below
-estimate: M                     # See estimate values below
+estimate: M                     # Planning field — see Estimate values below
 bdd: true                       # true → generates a .feature | false → unit test only
 updated: "2026-06-21"           # Date the story file was last revised (ISO 8601)
 ---
@@ -117,6 +117,21 @@ the trace story → decision is never lost.
 ### Estimate values (T-shirt sizing)
 
 `XS` · `S` · `M` · `L` · `XL`
+
+`estimate` is a **planning** field, so it is **required only** where someone is about
+to plan or do the work: `proposed`, `todo`, `in_progress`. On a story that is finished,
+decomposed, abandoned or parked (`done`, `split`, `to_extend`, `deferred`, `archived`)
+it is optional.
+
+That is not a licence to skip it — it is a refusal to **reconstruct** it. Filling an
+estimate after delivery produces a number that reads like a forecast nobody made; it
+informs no one and it corrupts any later reading of how the project estimates. A
+missing estimate on a delivered story is the honest record. (`released_in`, from the
+`release-versioning` module, is optional for the same reason.)
+
+The field stays **allowed on every status** and is validated wherever it appears: a
+story parked in `deferred` with an estimate keeps it, and it becomes required again the
+moment the story returns to `in_progress`.
 
 ---
 

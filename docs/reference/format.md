@@ -46,8 +46,13 @@ bdd: true
 | `epic` | Yes | one word or kebab-case |
 | `depends_on` | Yes | Array of IDs, or `[]` |
 | `status` | Yes | `proposed` · `todo` · `in_progress` · `done` · `split` · `to_extend` · `deferred` · `archived` |
-| `estimate` | Yes | `XS` · `S` · `M` · `L` · `XL` |
+| `estimate` | On `proposed` / `todo` / `in_progress` | `XS` · `S` · `M` · `L` · `XL` |
 | `bdd` | Yes | `true` · `false` |
+
+`estimate` is a **planning** field: required where the work is about to be planned or
+done, optional once the story is finished, decomposed, abandoned or parked. Filling it
+after delivery would reconstruct a forecast nobody made. It remains allowed — and
+validated — on every status.
 
 ## Sections
 

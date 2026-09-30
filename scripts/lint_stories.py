@@ -8,10 +8,10 @@ Validates that every story file is well-formed before implementation — the
 Checks (ERROR fails the run, WARN is informational unless --strict):
   - filename matches  S<NNN>[<suffix>]-<kebab-slug>.md
   - frontmatter present, with required keys: id, title, epic, depends_on,
-    status, estimate, bdd
+    status, bdd — plus estimate on proposed|todo|in_progress (planning-only)
   - id is S<NNN>[<suffix>] and matches the filename prefix
   - status in proposed|todo|in_progress|done|split|to_extend|deferred|archived
-  - estimate in XS|S|M|L|XL ; bdd in true|false
+  - estimate in XS|S|M|L|XL wherever present ; bdd in true|false
   - bdd: true  =>  at least one scenario with steps under "## Acceptance Criteria"
   - updated present and ISO 8601 (YYYY-MM-DD)            [WARN]
   - depends_on ids resolve to a story in the same dir    [WARN]
@@ -32,7 +32,14 @@ STATUSES = {
     'split', 'to_extend', 'deferred', 'archived',
 }
 ESTIMATES = {'XS', 'S', 'M', 'L', 'XL'}
-REQUIRED = ['id', 'title', 'epic', 'depends_on', 'status', 'estimate', 'bdd']
+REQUIRED = ['id', 'title', 'epic', 'depends_on', 'status', 'bdd']
+
+#: `estimate` is a **planning** field: it is demanded exactly where someone is about
+#: to plan or do the work. On a story that is finished, decomposed, abandoned or
+#: parked, filling it after the fact reconstructs a forecast nobody made — a number
+#: that reads like an estimate without being one. It stays *allowed* everywhere and is
+#: validated wherever present; it is only *required* here. See SPEC.md § Estimate.
+ESTIMATE_REQUIRED_STATUSES = {'proposed', 'todo', 'in_progress'}
 
 # A sub-story carries its parent's number plus one lowercase letter (S006a), so it
 # consumes no new number. A second level (S006a1) parses but is warned about — see
@@ -154,6 +161,8 @@ def main() -> int:
         estimate = fm.get('estimate')
         if estimate is not None and estimate not in ESTIMATES:
             err(name, f'estimate `{estimate}` not in {sorted(ESTIMATES)}')
+        elif estimate is None and status in ESTIMATE_REQUIRED_STATUSES:
+            err(name, f'missing required frontmatter key `estimate` (status `{status}`)')
 
         bdd = fm.get('bdd')
         if bdd is not None and bdd not in ('true', 'false'):

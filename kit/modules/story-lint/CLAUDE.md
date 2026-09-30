@@ -10,7 +10,10 @@ A story must be **well-formed before it is implemented**. Run
 `in_progress`, and in CI on every PR:
 
 - filename `S<NNN>[<letter>]-<kebab-slug>.md`, with `id` matching the filename;
-- required frontmatter complete (`id, title, epic, depends_on, status, estimate, bdd`);
+- required frontmatter complete (`id, title, epic, depends_on, status, bdd`);
+- `estimate` **on `proposed` / `todo` / `in_progress` only** — it is a planning field,
+  and reconstructing it on a delivered story would fabricate a forecast nobody made.
+  It stays allowed, and validated, on every status;
 - valid `status` (8-state lifecycle) and `estimate`;
 - `bdd: true` ⇒ at least one scenario with steps under `## Acceptance Criteria`;
 - `updated` present (warning), `depends_on` ids resolvable (warning), and a sub-story

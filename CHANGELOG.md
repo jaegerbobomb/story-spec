@@ -6,6 +6,31 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-30
+
+### Changed
+- **`estimate` is a planning field: required only on `proposed`, `todo` and
+  `in_progress`.** It becomes optional on `done`, `split`, `to_extend`, `deferred` and
+  `archived`, while staying allowed — and validated — on every status. See
+  [ADR-0005](docs/adr/0005-estimate-is-planning-only.md).
+
+  Requiring it everywhere meant requiring someone to invent a figure for work already
+  delivered. That figure is worse than the missing field: it reads like a forecast, it
+  sits in the same column as real forecasts, and it corrupts any later reading of how a
+  project estimates. The kit had already reached this conclusion for `released_in`
+  without generalising it.
+
+  The error now names the status, so the reason is visible:
+  `missing required frontmatter key `estimate` (status `todo`)`.
+
+  **Relaxation only** — no story that passed before fails now, and there is nothing to
+  migrate. Measured on a 291-story consumer project: 51 errors → **0**, with no story
+  file edited. A project that does estimate retrospectively can keep filling the field.
+
+  CI carries both directions: the five non-required statuses must pass without an
+  estimate, and each of the three required statuses must fail without one, checked one
+  status at a time. The step fails on the previous linter.
+
 ## [0.3.1] - 2026-09-29
 
 ### Fixed
@@ -175,7 +200,8 @@ Dogfoods its own [ADR](docs/adr/) and release discipline.
   docs, visual-review) before closing a story (`core/CLAUDE.core.md`).
 - **README** rewritten around the modular kit; docs reorganized along Diátaxis.
 
-[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/jaegerbobomb/story-spec/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/jaegerbobomb/story-spec/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jaegerbobomb/story-spec/compare/v0.1.0...v0.2.0
