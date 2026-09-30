@@ -49,7 +49,9 @@ Acceptance criteria use Gherkin embedded in markdown:
 
 **Stop and split** if a story exceeds one effective day or 300 lines of production
 code: children are `S<NNN>a`, `S<NNN>b` (same number, plus a letter) and the parent
-moves to `status: split`.
+moves to `status: split`. A split that keeps the scope exactly and decides nothing new
+inherits the parent's validation — children born `todo`, with the parent's validation
+note copied into their `## Notes`. Any change of scope, and they are `proposed`.
 
 ## Index
 
