@@ -39,6 +39,35 @@ directly: it holds the framing and the decision log, the children hold the work.
 A second level (`S006a1`) is accepted by the tooling but reported as a warning — it
 usually means the parent was split too coarsely.
 
+#### Validation is inherited when the split changes nothing
+
+A split that keeps the parent's scope **exactly** — the children add up to the parent,
+and the split introduces **no new decision** — inherits the parent's validation. Both
+conditions, not either: same scope **and** nothing new to decide.
+
+The children are then born `status: todo`, not `proposed`, and the parent's validation
+note is carried into their `## Notes` so the inheritance is traceable:
+
+```markdown
+## Notes
+
+- **Validated on 2026-09-30** (inherited from S198): scope identical to the parent,
+  no new decision.
+```
+
+At the slightest change of scope, or any choice the split had to make on its own, the
+normal rule applies: the children are `proposed` and wait for a human.
+
+The gate exists to catch splits that **drift**. At constant scope it protects nobody and
+taxes everybody: re-validating a perimeter a human validated the day before, with
+nothing new to look at, spends a review round on a formality — and a gate that fires
+where there is nothing to decide is the kind that gets skipped where there is.
+
+Deciding whether a split is scope-preserving is a judgement, so no tool enforces this —
+the linter cannot see it, and no status encodes it. What makes it auditable is the
+validation note in the children: a child born `todo` without one is the thing to
+question in review.
+
 ---
 
 ## Frontmatter (required)
@@ -239,5 +268,7 @@ tests/features/*.feature
 10. Set `status: done`
 
 **If a story grows beyond one effective day or 300 lines of production code:**
-stop, propose a split into sub-stories (`S<NNN>a`, `S<NNN>b`), wait for validation,
-then move the parent to `status: split`.
+stop, propose a split into sub-stories (`S<NNN>a`, `S<NNN>b`) and move the parent to
+`status: split`. If the split keeps the parent's scope exactly and decides nothing new,
+the children inherit the parent's validation and are born `todo` — see *Sub-stories*.
+Otherwise they are `proposed` and wait for validation.

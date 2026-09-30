@@ -9,6 +9,24 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 ## [0.4.0] - 2026-09-30
 
 ### Changed
+- **A split that changes nothing inherits the parent's validation.** When the children
+  add up to the parent's scope **exactly** and the split introduced **no new decision**,
+  they are born `status: todo` rather than `proposed`, and the parent's validation note is
+  carried into their `## Notes`. Both conditions, not either; at the slightest change of
+  scope the normal rule applies. See
+  [ADR-0006](docs/adr/0006-validation-inheritance-on-split.md).
+
+  Two core rules met badly: *wait for human validation* and *split anything over a day*.
+  A story validated on Monday and split on Tuesday asked its human to validate the same
+  perimeter twice, with nothing new to look at. The gate exists to catch splits that
+  **drift** — at constant scope it protects nobody, and a gate that fires where there is
+  nothing to decide is the kind people learn to click through where there is.
+
+  **No tooling change**: `todo` was already valid for a sub-story, and whether a split
+  preserved scope is a judgement no linter can make. The validation note in the children
+  is what makes it auditable — a child born `todo` without one is what to question in
+  review.
+
 - **`estimate` is a planning field: required only on `proposed`, `todo` and
   `in_progress`.** It becomes optional on `done`, `split`, `to_extend`, `deferred` and
   `archived`, while staying allowed — and validated — on every status. See
