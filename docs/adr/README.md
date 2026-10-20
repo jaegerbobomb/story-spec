@@ -1,3 +1,9 @@
+---
+title: Architecture decisions
+nav_order: 6
+has_children: true
+permalink: /adr/
+---
 # Architecture Decision Records
 
 | # | Title | Status | Date |

@@ -1,9 +1,8 @@
 ---
-layout: page
 title: Format reference
+nav_order: 3
 permalink: /format/
 ---
-
 # Format reference
 
 ## File naming

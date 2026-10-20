@@ -1,13 +1,22 @@
 ---
-layout: home
+title: Home
+nav_order: 1
+permalink: /
 ---
 
 # StorySpec
+{: .fs-9 }
 
-**Write the story once. Run it as a test. Compose the rest as modules.**
+Write the story once. Run it as a test. Compose the rest as modules.
+{: .fs-6 .fw-300 }
 
-User stories as living specifications - one markdown file, three audiences:
-product owner, developer, CI pipeline.
+User stories as living specifications: one markdown file, three audiences
+(product owner, developer, CI pipeline), and an operating contract that makes an
+AI coding agent work with discipline.
+
+[Getting started](tutorials/getting-started.md){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[Format reference](reference/format.md){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[View on GitHub](https://github.com/jaegerbobomb/story-spec){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
@@ -69,5 +78,5 @@ modes, each serving a different need:
 | **Reference** | look up exact details | [Format reference](reference/format.md) · [Full spec](https://github.com/jaegerbobomb/story-spec/blob/main/SPEC.md) |
 | **Explanation** | understand the why | [Design & decisions](explanation/) |
 
-→ [Story status](status.md)
-→ [GitHub repository](https://github.com/jaegerbobomb/story-spec)
+- [Story status](status.md) of the example stories, regenerated on every deploy
+- [GitHub repository](https://github.com/jaegerbobomb/story-spec)

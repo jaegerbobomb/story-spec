@@ -1,3 +1,8 @@
+---
+title: "ADR-0003 — The distributable catalog lives under kit/"
+parent: Architecture decisions
+nav_order: 3
+---
 # ADR-0003 — group the distributable catalog under `kit/`
 
 - **Status**: accepted

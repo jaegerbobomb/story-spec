@@ -1,3 +1,8 @@
+---
+title: "ADR-0004 — Sub-stories, proposed/split, computed story number"
+parent: Architecture decisions
+nav_order: 4
+---
 # ADR-0004 — sub-stories, `proposed`/`split`, and a computed story number
 
 - **Status**: accepted

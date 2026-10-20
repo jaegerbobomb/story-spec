@@ -6,6 +6,14 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Changed
+- **Documentation site restyled with Just the Docs** (sidebar navigation, search,
+  anchored headings, copy-code buttons, readable tables) in place of the default
+  Minima theme. Every page under `docs/` now carries `title`/`nav_order` front matter,
+  the ADRs are grouped under « Architecture decisions », and the generated
+  `status.md` gets the same front matter so it joins the navigation. No change to the
+  build workflow: `jekyll-remote-theme` ships with the `github-pages` gem.
+
 ## [0.4.0] - 2026-09-30
 
 ### Changed

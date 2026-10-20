@@ -1,9 +1,8 @@
 ---
-layout: page
 title: Getting started
+nav_order: 2
 permalink: /getting-started/
 ---
-
 # Getting started
 
 > **Using the modular kit?** The fastest path is `scripts/init.sh`: declare your

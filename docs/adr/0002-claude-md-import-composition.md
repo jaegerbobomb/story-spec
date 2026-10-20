@@ -1,3 +1,8 @@
+---
+title: "ADR-0002 — Composition via @import in CLAUDE.md"
+parent: Architecture decisions
+nav_order: 2
+---
 # ADR-0002 — Composition via `@import` in CLAUDE.md (no generated AGENTS.md)
 
 - **Status** : accepted

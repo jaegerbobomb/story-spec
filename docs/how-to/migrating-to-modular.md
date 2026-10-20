@@ -1,3 +1,8 @@
+---
+title: Migrating to the modular kit
+nav_order: 4
+permalink: /migrating-to-modular/
+---
 # Migration — from StorySpec "templates to copy" to the modular kit
 
 This guide moves a project that uses the old StorySpec distribution

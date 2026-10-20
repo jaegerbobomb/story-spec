@@ -1,3 +1,8 @@
+---
+title: "ADR-0001 — story-spec goes modular"
+parent: Architecture decisions
+nav_order: 1
+---
 # ADR-0001 — story-spec goes modular (core + opt-in modules)
 
 - **Status** : proposed
