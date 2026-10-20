@@ -1,9 +1,8 @@
 ---
-layout: page
-title: Explanation
+title: Design and decisions
+nav_order: 5
 permalink: /explanation/
 ---
-
 # Explanation — design & decisions
 
 Background and rationale: *why* StorySpec is shaped the way it is. For step-by-step

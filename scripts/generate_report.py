@@ -94,6 +94,12 @@ def main() -> int:
     columns = '|---' * (len(BADGE) + 1 + bool(unknown)) + '|'
 
     md = f"""\
+---
+title: Story status
+nav_order: 7
+permalink: /status/
+---
+
 # Story Status
 
 Generated: {date.today().isoformat()}

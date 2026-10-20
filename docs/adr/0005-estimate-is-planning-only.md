@@ -1,3 +1,8 @@
+---
+title: "ADR-0005 — estimate is a planning field"
+parent: Architecture decisions
+nav_order: 5
+---
 # ADR-0005 — `estimate` is a planning field, not a record
 
 - **Status**: accepted
