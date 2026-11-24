@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'examples/stories/**'
+      - 'examples/epics/**'
       - 'scripts/extract_features.py'
       - 'scripts/lint_stories.py'
       - 'scripts/next_story_id.py'
@@ -166,6 +167,38 @@ jobs:
           for status in ("proposed", "todo", "in_progress"):
               if lint([status]) == 0:
                   sys.exit(f"estimate not demanded on `{status}`")
+          PY
+
+      - name: Epics are checked only when asked, and then strictly (ADR-0007)
+        run: |
+          python3 - <<'PY'
+          import pathlib, shutil, subprocess, sys, tempfile
+
+          def lint(*args):
+              return subprocess.call([sys.executable, "scripts/lint_stories.py", *args])
+
+          # The examples carry an epic file for every epic they use.
+          if lint("--stories-dir=examples/stories", "--epics-dir=examples/epics", "--strict"):
+              sys.exit("examples fail the epics check")
+
+          # A story whose epic has no file: accepted without the flag, rejected with it.
+          d = pathlib.Path(tempfile.mkdtemp())
+          for f in pathlib.Path("examples/stories").glob("S*.md"):
+              text = f.read_text().replace("epic: auth", "epic: billing")
+              (d / f.name).write_text(text)
+          if lint(f"--stories-dir={d}"):
+              sys.exit("a story was rejected for its epic without --epics-dir")
+          if lint(f"--stories-dir={d}", "--epics-dir=examples/epics") == 0:
+              sys.exit("a story pointing to an epic without a file was accepted")
+
+          # A malformed epic file is rejected.
+          e = pathlib.Path(tempfile.mkdtemp()) / "epics"
+          e.mkdir()
+          (e / "auth.md").write_text(
+              '---\nid: auth\ntitle: "Accounts"\norder: 1\nstatus: busy\n'
+              'updated: "2026-11-24"\n---\n\n## Goal\n\nSign in.\n')
+          if lint("--stories-dir=examples/stories", f"--epics-dir={e}") == 0:
+              sys.exit("an epic with a bad status and no exit criteria was accepted")
           PY
 
       - name: Dry-run extraction

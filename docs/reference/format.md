@@ -42,7 +42,7 @@ bdd: true
 |---|---|---|
 | `id` | Yes | `S` + 3 digits, optionally + a sub-story letter |
 | `title` | Yes | String, ≤ 8 words |
-| `epic` | Yes | one word or kebab-case |
+| `epic` | Yes | one word or kebab-case; with the `epics` module, must match a file `epics/<epic>.md` |
 | `depends_on` | Yes | Array of IDs, or `[]` |
 | `status` | Yes | `proposed` · `todo` · `in_progress` · `done` · `split` · `to_extend` · `deferred` · `archived` |
 | `estimate` | On `proposed` / `todo` / `in_progress` | `XS` · `S` · `M` · `L` · `XL` |
