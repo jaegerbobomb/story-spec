@@ -38,11 +38,17 @@ from `main` alone is how two sessions on the same day pick the same one.
 9. Single commit: `feat(S<NNN>): <short slug>`.
 10. Move the story to `status: done`.
 
-**Size**: if the story exceeds ~1 day or ~300 lines of prod code, **stop without committing**,
-propose a split (`S<NNN>a`, `S<NNN>b`) and wait for validation. The children take the
-parent's number plus a letter — no new number is consumed — and the parent moves to
-**`status: split`**: it keeps the framing and the decision log, the children carry the
-work.
+**Size**: if the story exceeds ~1 day or ~300 lines of prod code, **stop without committing**
+and propose a split (`S<NNN>a`, `S<NNN>b`). The children take the parent's number plus a
+letter — no new number is consumed — and the parent moves to **`status: split`**: it keeps
+the framing and the decision log, the children carry the work.
+
+**Validation inherits when the split changes nothing**: if the children add up to the
+parent's scope **and** the split decided nothing new, they are born `todo` and carry the
+parent's validation note in their `## Notes`. Both conditions, not either. At the
+slightest change of scope, or any choice the split made on its own, they are `proposed`
+and wait for a human. Re-validating an unchanged perimeter costs a review round and
+protects nobody.
 
 **Ambiguity**: ask a question before coding; record the answer under `## Notes`.
 

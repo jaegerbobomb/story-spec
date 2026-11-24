@@ -36,7 +36,9 @@ You author a story-spec story, nothing more. You don't code, you don't implement
 
 - If the request is ambiguous, ask **the** blocking questions (max 3) instead of guessing.
 - Split if the story clearly exceeds ~1 day / ~300 lines: propose `S<NNN>a/b` (the
-  letter reuses the parent's number) and put the parent in `status: split`.
+  letter reuses the parent's number) and put the parent in `status: split`. If the split
+  keeps the parent's scope exactly **and** decides nothing new, the children are born
+  `todo` and repeat the parent's validation note under `## Notes`; otherwise `proposed`.
 - **Never** create a `bug`/`type: bug` story (see the core's bug doctrine).
 
 ## Output
