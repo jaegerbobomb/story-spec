@@ -6,6 +6,22 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Fixed
+- **The agents defer to a project `SPEC.md` that `init.sh` never created.**
+  `spec-guardian` and `story-implementer` treat `SPEC.md` as the project spec
+  ("`SPEC.md` wins"), the `adr` module writes a section "to insert into SPEC.md" — but
+  `init.sh` created no `SPEC.md`, and copied the module sections where nothing reads
+  them. It now scaffolds `SPEC.md` from `kit/templates/SPEC.project.md` and
+  `stories/README.md` from the format summary (never overwriting either), and inlines
+  the enabled modules' SPEC sections between `story-spec:spec-sections` markers on
+  every run, `--sync` included. A `SPEC.md` without the markers is left alone. See
+  [ADR-0008](docs/adr/0008-project-spec-vs-format-spec.md).
+
+### Changed
+- **"SPEC.md" now says which one.** The agents and the explanation page call the
+  project's file "the project spec" and point to `stories/README.md` for the story
+  format; StorySpec's own `SPEC.md` is "the format spec". No file renamed.
+
 ### Changed
 - **Documentation site restyled with Just the Docs** (sidebar navigation, search,
   anchored headings, copy-code buttons, readable tables) in place of the default

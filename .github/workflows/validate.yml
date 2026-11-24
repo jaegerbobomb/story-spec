@@ -184,6 +184,39 @@ jobs:
           echo "Generated $count .feature file(s)"
           [ "$count" -gt 0 ] || { echo "No .feature files generated"; exit 1; }
 
+      - name: init scaffolds the project spec and inlines module sections (ADR-0008)
+        run: |
+          # init.sh reads the manifest with the jq-style `yq` (python-yq), the flavour
+          # its `.modules[]? // empty` syntax is written for.
+          # The runner ships the Go `yq` (mikefarah) on PATH: put python-yq first, in a venv
+          # so the system Python stays untouched.
+          python3 -m venv /tmp/yqv && /tmp/yqv/bin/pip install --quiet yq
+          export PATH="/tmp/yqv/bin:$PATH"
+          set -euo pipefail
+          KIT="$PWD/kit"; INIT="$PWD/scripts/init.sh"
+
+          p=$(mktemp -d); mkdir -p "$p/.story-spec"; cd "$p"
+          printf 'version: 1\ntest_adapter: none\nmodules:\n  - adr\n  - story-lint\n' > .story-spec/manifest.yaml
+          STORY_SPEC_DIST="$KIT" bash "$INIT"
+          test -f SPEC.md            || { echo "no project SPEC.md scaffolded"; exit 1; }
+          test -f stories/README.md  || { echo "no stories/README.md scaffolded"; exit 1; }
+          grep -q '^## Architecture Decision Records' SPEC.md || { echo "adr section not inlined"; exit 1; }
+
+          # --sync is idempotent, and drops the section of a module turned off.
+          cp SPEC.md /tmp/spec.before
+          STORY_SPEC_DIST="$KIT" bash "$INIT" --sync
+          diff /tmp/spec.before SPEC.md
+          printf 'version: 1\ntest_adapter: none\nmodules:\n  - story-lint\n' > .story-spec/manifest.yaml
+          STORY_SPEC_DIST="$KIT" bash "$INIT" --sync
+          ! grep -q 'Architecture Decision Records' SPEC.md || { echo "disabled module section kept"; exit 1; }
+
+          # A project's own SPEC.md (no markers) is never touched.
+          q=$(mktemp -d); mkdir -p "$q/.story-spec"; cd "$q"
+          echo '# My own spec' > SPEC.md
+          printf 'version: 1\nmodules:\n  - adr\n' > .story-spec/manifest.yaml
+          STORY_SPEC_DIST="$KIT" bash "$INIT"
+          test "$(cat SPEC.md)" = '# My own spec' || { echo "project SPEC.md overwritten"; exit 1; }
+
   module-autonomy:
     runs-on: ubuntu-latest
     steps:

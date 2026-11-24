@@ -17,8 +17,8 @@ that is where it pays off most.
 
 An LLM agent, left to itself, will write code first and rationalize it later: skip
 the spec, skip the failing test, never record why a structural choice was made,
-forget the changelog and the docs. StorySpec removes that freedom. `SPEC.md` is the
-*format* (the *what*); the `kit/` fragments are the **operating contract** — they are
+forget the changelog and the docs. StorySpec removes that freedom. StorySpec's own
+`SPEC.md` is the *format* (the *what*); the `kit/` fragments are the **operating contract** — they are
 loaded into the agent's `CLAUDE.md` (or copied into an `AGENTS.md`) and read on every
 turn, so the agent is constrained to:
 
@@ -52,3 +52,16 @@ recorded as Architecture Decision Records:
 - [ADR-0002 — composition via `@import` in CLAUDE.md](../adr/0002-claude-md-import-composition.md)
 
 See the full [ADR index](../adr/).
+
+## Two files called `SPEC.md`
+
+StorySpec has a `SPEC.md`: the **format** of a story — frontmatter, statuses, sections.
+Your project has one too: the **project spec** — how *your* application is built
+(architecture, conventions, external contracts). They answer different questions, and
+the agents read only the second one: `spec-guardian` checks a story against it,
+`story-implementer` stops when a story contradicts it.
+
+`init.sh` scaffolds the project `SPEC.md` from `kit/templates/SPEC.project.md` (never
+overwriting an existing one) and inlines the SPEC sections of the enabled modules
+between two markers, refreshed on every run. The format itself reaches the project as
+`stories/README.md`. See [ADR-0008](../adr/0008-project-spec-vs-format-spec.md).

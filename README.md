@@ -81,7 +81,9 @@ Generated `.feature` files are build artifacts - gitignored.
 
 StorySpec moved from *"templates to copy"* to a *"kit to compose"*. A project
 declares the modules it wants in a manifest, and `story-spec init` composes the
-`CLAUDE.md`, the SPEC and the scaffolding from the core plus those modules.
+`CLAUDE.md`, the project's `SPEC.md` (its architecture spec, with the modules'
+sections inlined) and the scaffolding from the core plus those modules. Not to be
+confused with this repository's `SPEC.md`, which is the story *format*.
 
 ```
 story-spec/                 # ← this repo (the kit's source)

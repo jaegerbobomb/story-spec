@@ -27,7 +27,7 @@ You implement a validated story. You don't redefine the scope.
 
 - **Stop** if the story exceeds ~1 day / ~300 lines: don't commit partial work,
   propose a split.
-- If the story contradicts `SPEC.md`: `SPEC.md` wins — flag and stop (see `spec-guardian`).
+- If the story contradicts the project spec `SPEC.md`: `SPEC.md` wins — flag and stop (see `spec-guardian`).
 - Any ambiguity → one question, then record the answer in the story's `## Notes`.
 - Report faithfully: if tests fail, say so with the output; never announce
   "green" without having observed it.
