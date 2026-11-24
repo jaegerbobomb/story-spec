@@ -6,6 +6,13 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Added
+- **How-to: running the stories with pytest-bdd.** The manifest accepts
+  `test_adapter: bdd-pytest`, but every page spoke of Behat and Cucumber. The new
+  how-to wires a Python project: generating the features before pytest collects (CI
+  command or a `conftest.py` hook), one step-definition module per story, and the
+  traps (backticks matched literally, `And` takes the previous step's type).
+
 ### Changed
 - **Documentation site restyled with Just the Docs** (sidebar navigation, search,
   anchored headings, copy-code buttons, readable tables) in place of the default
