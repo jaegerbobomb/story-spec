@@ -6,6 +6,17 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Added
+- **`design:` field and UI acceptance criteria (`visual-review` module).** A story
+  that implements a designed screen lists its mockups — URLs or repository paths — in
+  an optional `design: [...]` field, so the implementer builds from the mockup and the
+  reviewer compares screenshots against the same source. The linter warns when a path
+  does not exist (relative to the parent of the stories directory). The module
+  fragment now says how to write acceptance criteria for a UI story: name the
+  condition that changes the layout (`Given the window is 500 px wide`), assert what a
+  test can query, and leave visual conformance to the screenshots. Template and
+  `SPEC.md` (§ Optional module fields) updated.
+
 ### Changed
 - **Documentation site restyled with Just the Docs** (sidebar navigation, search,
   anchored headings, copy-code buttons, readable tables) in place of the default

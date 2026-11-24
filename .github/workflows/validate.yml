@@ -168,6 +168,31 @@ jobs:
                   sys.exit(f"estimate not demanded on `{status}`")
           PY
 
+      - name: design references are URLs or paths that exist (visual-review)
+        run: |
+          python3 - <<'PY'
+          import pathlib, shutil, subprocess, sys, tempfile
+
+          root = pathlib.Path(tempfile.mkdtemp())
+          (root / "stories").mkdir()
+          (root / "docs/design").mkdir(parents=True)
+          (root / "docs/design/timeline.png").write_bytes(b"")
+          for f in pathlib.Path("examples/stories").glob("S*.md"):
+              shutil.copy(f, root / "stories" / f.name)
+
+          def lint_with(design):
+              s = root / "stories" / "S001-user-registration.md"
+              text = pathlib.Path("examples/stories/S001-user-registration.md").read_text()
+              s.write_text(text.replace("bdd: true", f"bdd: true\ndesign: {design}", 1))
+              return subprocess.call([sys.executable, "scripts/lint_stories.py",
+                                      f"--stories-dir={root / 'stories'}", "--strict"])
+
+          if lint_with('["docs/design/timeline.png", "https://example.com/mockup"]'):
+              sys.exit("an existing path and a URL were rejected")
+          if lint_with('["docs/design/missing.png"]') == 0:
+              sys.exit("a design path that does not exist was accepted under --strict")
+          PY
+
       - name: Dry-run extraction
         run: |
           python3 scripts/extract_features.py \

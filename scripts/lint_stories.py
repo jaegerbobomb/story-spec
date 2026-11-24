@@ -16,6 +16,8 @@ Checks (ERROR fails the run, WARN is informational unless --strict):
   - updated present and ISO 8601 (YYYY-MM-DD)            [WARN]
   - depends_on ids resolve to a story in the same dir    [WARN]
   - adr ids (adr module) are integers                    [WARN]
+  - design refs (visual-review module) are URLs or paths that exist,
+    relative to the parent of the stories dir            [WARN]
   - title <= 8 words                                     [WARN]
   - sub-story nested beyond one level (S006a1)           [WARN]
 
@@ -183,6 +185,15 @@ def main() -> int:
         for ref in fm.get('adr', []) or []:
             if not str(ref).isdigit():
                 warn(name, f'adr `{ref}` should be an ADR number (integer)')
+
+        design = fm.get('design', [])
+        if isinstance(design, str):
+            design = [design] if design else []
+        for ref in design:
+            if re.match(r'^https?://', ref):
+                continue
+            if not (stories_dir.parent / ref).exists():
+                warn(name, f'design `{ref}` is neither a URL nor an existing path')
 
         title = fm.get('title', '')
         if title and len(title.split()) > 8:
