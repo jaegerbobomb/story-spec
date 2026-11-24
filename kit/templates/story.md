@@ -8,6 +8,7 @@ estimate: S
 bdd: true
 updated: "YYYY-MM-DD"
 adr: []                  # optional (adr module): ADR numbers governing this story
+design: []               # optional (visual-review module): mockups this story implements
 ---
 
 ## User story

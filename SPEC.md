@@ -109,10 +109,16 @@ core block above):
 |---|---|---|
 | `adr` | `adr` | List of ADR numbers governing this story, e.g. `adr: [1, 7]`. The story↔decision back-reference (the ADR lists `Related stories`). |
 | `released_in` | `release-versioning` | The version/tag the story shipped in. |
+| `design` | `visual-review` | List of the mockups or design references the story implements — URLs or repository paths, e.g. `design: ["docs/design/timeline.png"]`. |
 
 When the `adr` module is enabled, **a story whose behaviour is shaped by a structural
 decision must reference that ADR** via `adr: [...]` (or cite it under `## Notes`), so
 the trace story → decision is never lost.
+
+When the `visual-review` module is enabled, **a story that implements a designed screen
+references the design** via `design: [...]`, so the implementer builds from the
+mockup rather than from a paraphrase of it, and the reviewer compares against the
+same source.
 
 ### Estimate values (T-shirt sizing)
 
