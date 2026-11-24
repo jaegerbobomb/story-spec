@@ -6,6 +6,21 @@ and the kit adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
+### Added
+- **`epics` module: the layer above the stories.** Every value used in `epic:` gets a
+  file `epics/<epic>.md` with a `## Goal`, an ordered place in the roadmap (`order:`), a
+  status (`planned | active | done | dropped`) and `## Exit criteria` as a checklist —
+  the "finished when" that no single story can hold. The file does not list its
+  stories (the `epic:` field does, and a second list would drift). Template in
+  `kit/modules/epics/templates/epic.md`, example in `examples/epics/`. See
+  [ADR-0007](docs/adr/0007-epics-module.md).
+
+  `lint_stories.py --epics-dir=epics` checks that every story's epic has a file and
+  that each epic file is well-formed. **Opt-in**: without the flag the linter behaves
+  exactly as before, so no consumer project changes. CI carries both directions: a
+  story pointing to an epic without a file passes without the flag and fails with it,
+  and a malformed epic file fails.
+
 ### Changed
 - **Documentation site restyled with Just the Docs** (sidebar navigation, search,
   anchored headings, copy-code buttons, readable tables) in place of the default

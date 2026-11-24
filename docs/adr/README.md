@@ -13,3 +13,4 @@ permalink: /adr/
 | [0003](0003-kit-source-layout.md) | Group the distributable catalog under `kit/` | accepted | 2026-06-24 |
 | [0004](0004-substories-proposed-split-and-id-allocation.md) | Sub-stories, `proposed`/`split`, and a computed story number | accepted | 2026-09-28 |
 | [0005](0005-estimate-is-planning-only.md) | `estimate` is a planning field, not a record | accepted | 2026-09-30 |
+| [0007](0007-epics-module.md) | An `epics` module for the layer above the stories | proposed | 2026-11-24 |

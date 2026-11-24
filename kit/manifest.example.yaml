@@ -15,6 +15,7 @@ modules:
   - release-versioning  # CHANGELOG + version + README kept in sync
   - claude-code         # session-start hook, settings.json, agents/skills
   # - story-lint        # CI gate: lint_stories.py validates every story file
+  # - epics             # epics/<epic>.md: goal, order, exit criteria
   # - docs-diataxis     # organize product docs along the four Diátaxis modes
   # - visual-review     # screenshots synced to stories
 

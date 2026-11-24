@@ -19,8 +19,16 @@ Checks (ERROR fails the run, WARN is informational unless --strict):
   - title <= 8 words                                     [WARN]
   - sub-story nested beyond one level (S006a1)           [WARN]
 
+With --epics-dir (module: epics), also:
+  - every story's `epic` has a file <epics-dir>/<epic>.md
+  - every epic file has id (= file name), title, order (integer), status in
+    planned|active|done|dropped, and the sections "## Goal" and "## Exit criteria"
+  - updated present and ISO 8601                         [WARN]
+  - two epics sharing the same order                     [WARN]
+
 Usage:
-    python3 lint_stories.py [--stories-dir=stories] [--verbose] [--strict]
+    python3 lint_stories.py [--stories-dir=stories] [--epics-dir=epics]
+                            [--verbose] [--strict]
 """
 
 import re
@@ -50,6 +58,11 @@ ID_RE = re.compile(rf'^S\d{{3}}{SUFFIX}$')
 NESTED_SUFFIX_RE = re.compile(r'^S\d{3}[a-z]\d')
 DATE_RE = re.compile(r'^\d{4}-\d{2}-\d{2}$')
 
+# Module `epics` — see kit/modules/epics/SPEC.section.md.
+EPIC_STATUSES = {'planned', 'active', 'done', 'dropped'}
+EPIC_REQUIRED = ['id', 'title', 'order', 'status']
+EPIC_SECTIONS = ['Goal', 'Exit criteria']
+
 
 def parse_args():
     args = sys.argv[1:]
@@ -60,8 +73,10 @@ def parse_args():
                 return a[len(f'--{name}='):]
         return default
 
+    epics_dir = get('epics-dir', None)
     return (
         Path(get('stories-dir', 'stories')),
+        Path(epics_dir) if epics_dir else None,
         '--verbose' in args,
         '--strict' in args,
     )
@@ -110,8 +125,71 @@ def has_scenarios(content: str) -> bool:
     return False
 
 
+def has_section(content: str, title: str) -> bool:
+    """A `## <title>` heading at the start of a line, followed by some text."""
+    match = re.search(rf'^## {re.escape(title)}[ \t]*$', content, re.M)
+    if not match:
+        return False
+    rest = content[match.end():]
+    end = re.search(r'^## ', rest, re.M)
+    body = rest[:end.start()] if end else rest
+    return bool(re.sub(r'<!--.*?-->', '', body, flags=re.S).strip())
+
+
+def lint_epics(epics_dir: Path, err, warn, verbose) -> set:
+    """Validate the epic files; return the set of epic ids that have a file."""
+    known = set()
+    failed = set()
+
+    def e(name, msg):
+        failed.add(name)
+        err(name, msg)
+
+    if not epics_dir.is_dir():
+        e(str(epics_dir), 'epics directory not found (module `epics`)')
+        return known
+    orders = {}
+    for file in sorted(epics_dir.glob('*.md')):
+        if file.name == 'README.md':
+            continue
+        name = f'{epics_dir.name}/{file.name}'
+        content = file.read_text(encoding='utf-8')
+        fm, present = parse_frontmatter(content)
+        known.add(file.stem)
+        if not present:
+            e(name, 'missing or unterminated YAML frontmatter')
+            continue
+        for k in EPIC_REQUIRED:
+            if k not in fm:
+                e(name, f'missing required frontmatter key `{k}`')
+        if fm.get('id') and fm['id'] != file.stem:
+            e(name, f'id `{fm["id"]}` does not match the file name `{file.stem}`')
+        status = fm.get('status')
+        if status is not None and status not in EPIC_STATUSES:
+            e(name, f'status `{status}` not in {sorted(EPIC_STATUSES)}')
+        order = fm.get('order')
+        if order is not None:
+            if not str(order).isdigit():
+                e(name, f'order `{order}` must be a non-negative integer')
+            elif order in orders:
+                warn(name, f'order {order} already used by `{orders[order]}`')
+            else:
+                orders[order] = file.stem
+        for section in EPIC_SECTIONS:
+            if not has_section(content, section):
+                e(name, f'missing or empty section "## {section}"')
+        updated = fm.get('updated')
+        if updated is None:
+            warn(name, 'no `updated` field (recommended, ISO 8601)')
+        elif not DATE_RE.match(updated):
+            warn(name, f'`updated: {updated}` is not ISO 8601 (YYYY-MM-DD)')
+        if verbose and name not in failed:
+            print(f'[ok]    {name}')
+    return known
+
+
 def main() -> int:
-    stories_dir, verbose, strict = parse_args()
+    stories_dir, epics_dir, verbose, strict = parse_args()
 
     files = sorted(stories_dir.glob('S*.md'))
     if not files:
@@ -130,6 +208,8 @@ def main() -> int:
         nonlocal warnings
         warnings += 1
         print(f'[warn]  {name}: {msg}')
+
+    known_epics = lint_epics(epics_dir, err, warn, verbose) if epics_dir else None
 
     for file in files:
         name = file.name
@@ -153,6 +233,10 @@ def main() -> int:
             err(name, f'id `{sid}` must be S<NNN>[<suffix>]')
         elif sid and not name.startswith(sid + '-'):
             err(name, f'id `{sid}` does not match filename prefix')
+
+        epic = fm.get('epic')
+        if known_epics is not None and epic and epic not in known_epics:
+            err(name, f'epic `{epic}` has no file {epics_dir}/{epic}.md (module `epics`)')
 
         status = fm.get('status')
         if status is not None and status not in STATUSES:

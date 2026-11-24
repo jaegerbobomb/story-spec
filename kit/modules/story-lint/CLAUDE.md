@@ -21,6 +21,9 @@ A story must be **well-formed before it is implemented**. Run
 
 Errors fail the run; `--strict` also fails on warnings. Fix lint errors before coding.
 
+With the `epics` module, add `--epics-dir=epics`: every story's epic must then have a
+well-formed `epics/<epic>.md`.
+
 ## Companion tool
 
 `scripts/next_story_id.py` answers the other half of the question — *which number is

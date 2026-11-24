@@ -110,6 +110,7 @@ your-app/
 | Module | Purpose |
 |---|---|
 | `adr` | Architecture Decision Records (+ `adr-new` skill) |
+| `epics` | one file per epic: goal, order, exit criteria — the roadmap in the repo |
 | `github-piloting` | epics + sub-issues + session log |
 | `release-versioning` | CHANGELOG + version + README kept in sync |
 | `story-lint` | CI gate: `lint_stories.py` validates every story file |
