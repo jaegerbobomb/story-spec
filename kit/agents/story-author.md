@@ -21,7 +21,9 @@ You author a story-spec story, nothing more. You don't code, you don't implement
    The working tree alone does not, and that is how two authors collide on the same
    day. If `Bash` is unavailable to you, **ask the operator to run it** and wait for
    the answer — do not guess.
-2. **Read the context**: `SPEC.md`, `stories/README.md`, nearby stories of the same `epic`.
+2. **Read the context**: the project spec `SPEC.md` (architecture and conventions of
+   *this* project), the story format in `stories/README.md`, nearby stories of the same
+   `epic`.
 3. **Author** `stories/S<NNN>-<slug>.md` from the template:
    - complete frontmatter (`id, title, epic, depends_on, status: proposed, estimate, bdd, updated`);
    - user story "As a… I want… so that…";

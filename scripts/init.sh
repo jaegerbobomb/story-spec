@@ -78,6 +78,10 @@ say "modules: $(echo "$MODULES" | tr '\n' ' ')"
 do_cp "$DIST/core/CLAUDE.core.md" "$ROOT/.story-spec/core/CLAUDE.core.md"
 if [ "$SYNC" = 0 ]; then
   do_cp "$DIST/templates/story.md" "$ROOT/stories/_TEMPLATE.md" 2>/dev/null || true
+  # The story format, summarised for the project (the agents read it; ADR-0008).
+  do_cp "$DIST/templates/stories-README.md" "$ROOT/stories/README.md" 2>/dev/null || true
+  # The PROJECT spec (architecture, conventions) — never overwritten once it exists.
+  do_cp "$DIST/templates/SPEC.project.md" "$ROOT/SPEC.md" 2>/dev/null || true
 fi
 
 # 2) Modules (CLAUDE fragment + SPEC section + templates + module-specific skills)
@@ -107,6 +111,30 @@ if [ "$DRY" = 0 ]; then
     /<!-- END story-spec:modules/   {skip=0}
     skip!=1 {print}
   ' "$DIST/CLAUDE.dist.md" > "$ROOT/CLAUDE.md.tmp" && mv "$ROOT/CLAUDE.md.tmp" "$ROOT/CLAUDE.md"
+fi
+
+# 5) Module sections of the project SPEC.md (ADR-0008). Inlined, not @imported: SPEC.md
+# is read by humans as much as by agents. Only the block between the markers is
+# rewritten; a SPEC.md without the markers is the project's own and is left alone.
+SPEC="$ROOT/SPEC.md"
+if [ "$DRY" = 1 ]; then
+  say "would refresh the module sections of SPEC.md (between the story-spec markers)"
+elif [ -f "$SPEC" ] && grep -q '<!-- BEGIN story-spec:spec-sections' "$SPEC"; then
+  SECTIONS="$(for m in $MODULES; do
+    f="$ROOT/.story-spec/modules/$m/SPEC.section.md"
+    # Drop the fragment's own H1 ("# Module `x` — SPEC section …"): it is a note to the
+    # kit maintainer, not part of the project's spec.
+    if [ -f "$f" ]; then echo; sed '1{/^# /d;}' "$f" | sed '1{/^$/d;}'; fi
+  done)"
+  export SECTIONS
+  awk '
+    /<!-- BEGIN story-spec:spec-sections/ {print; print ENVIRON["SECTIONS"]; skip=1; next}
+    /<!-- END story-spec:spec-sections/   {skip=0}
+    skip!=1 {print}
+  ' "$SPEC" > "$SPEC.tmp" && mv "$SPEC.tmp" "$SPEC"
+  say "refreshed the module sections of SPEC.md"
+elif [ -f "$SPEC" ]; then
+  say "SPEC.md has no story-spec markers: module sections not inserted (see ADR-0008)"
 fi
 
 if [ "$DRY" = 1 ]; then say "done. (dry-run)"; else say "done."; fi
